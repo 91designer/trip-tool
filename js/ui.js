@@ -377,6 +377,53 @@ async function saveNewPlace() {
     }
 }
 
+// -------------------------------------------------------------
+// 🗡️ WISHLIST & SIDE QUEST DRAG AND DROP CONTROLS
+// -------------------------------------------------------------
+
+let draggedWishlistIndex = null;
+
+function handleWishlistDragStart(e, index) {
+    draggedWishlistIndex = index;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index);
+    e.currentTarget.classList.add('opacity-40', 'border-amber-400');
+}
+
+function handleWishlistDragOver(e) {
+    if (e.preventDefault) e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+
+function handleWishlistDrop(e, targetIndex) {
+    if (e.stopPropagation) e.stopPropagation();
+    if (e.preventDefault) e.preventDefault();
+
+    if (draggedWishlistIndex !== null && draggedWishlistIndex !== targetIndex) {
+        const itemToMove = window.wishlist.splice(draggedWishlistIndex, 1)[0];
+        window.wishlist.splice(targetIndex, 0, itemToMove);
+        saveData();
+        renderWishlist();
+        if (typeof playSfx === 'function') playSfx('equip');
+    }
+    return false;
+}
+
+function handleWishlistDragEnd(e) {
+    draggedWishlistIndex = null;
+    e.currentTarget.classList.remove('opacity-40', 'border-amber-400');
+}
+
+function moveWishlistItem(fromIndex, toIndex) {
+    if (toIndex < 0 || toIndex >= window.wishlist.length) return;
+    const item = window.wishlist.splice(fromIndex, 1)[0];
+    window.wishlist.splice(toIndex, 0, item);
+    saveData();
+    renderWishlist();
+    if (typeof playSfx === 'function') playSfx('click');
+}
+
 function renderWishlist() {
     const container = document.getElementById('wishlistContainer');
     if (!container) return;
@@ -390,17 +437,42 @@ function renderWishlist() {
         return;
     }
 
-    container.innerHTML = window.wishlist.map((item, idx) => `
-        <div class="bg-slate-900 border border-slate-700/70 p-2 rounded flex items-center justify-between gap-2 text-xs">
-            <label class="flex items-center gap-2 flex-1 cursor-pointer truncate ${item.done ? 'line-through text-slate-500' : 'text-slate-200'}">
-                <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleWishlistItem(${idx})" class="rounded border-slate-700 text-amber-500 accent-amber-500">
-                <span class="truncate">${item.text}</span>
-            </label>
-            <button onclick="deleteWishlistItem(${idx})" class="text-slate-500 hover:text-rose-400 p-0.5">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-    `).join('');
+    container.innerHTML = window.wishlist.map((item, idx) => {
+        const isFirst = idx === 0;
+        const isLast = idx === window.wishlist.length - 1;
+
+        return `
+            <div draggable="true" 
+                ondragstart="handleWishlistDragStart(event, ${idx})" 
+                ondragover="handleWishlistDragOver(event)" 
+                ondrop="handleWishlistDrop(event, ${idx})" 
+                ondragend="handleWishlistDragEnd(event)" 
+                class="bg-slate-900 border border-slate-700/70 p-2 rounded flex items-center justify-between gap-2 text-xs hover:border-slate-500 transition cursor-grab active:cursor-grabbing group">
+                
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <span class="text-slate-600 group-hover:text-amber-400 font-bold select-none cursor-grab text-xs" title="按住拖曳排序">⣿</span>
+                    <label class="flex items-center gap-2 flex-1 cursor-pointer truncate ${item.done ? 'line-through text-slate-500' : 'text-slate-200'}">
+                        <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleWishlistItem(${idx})" class="rounded border-slate-700 text-amber-500 accent-amber-500 shrink-0">
+                        <span class="truncate">${item.text}</span>
+                    </label>
+                </div>
+
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <div class="flex flex-col gap-0.5">
+                        <button onclick="moveWishlistItem(${idx}, ${idx - 1})" class="${isFirst ? 'opacity-20 cursor-not-allowed' : 'hover:text-amber-300 text-slate-500'} p-0.5 text-[8px]" ${isFirst ? 'disabled' : ''} title="向上移動">
+                            <i class="fa-solid fa-chevron-up"></i>
+                        </button>
+                        <button onclick="moveWishlistItem(${idx}, ${idx + 1})" class="${isLast ? 'opacity-20 cursor-not-allowed' : 'hover:text-amber-300 text-slate-500'} p-0.5 text-[8px]" ${isLast ? 'disabled' : ''} title="向下移動">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <button onclick="deleteWishlistItem(${idx})" class="text-slate-500 hover:text-rose-400 p-1 ml-0.5" title="刪除任務">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function addWishlistItem() {

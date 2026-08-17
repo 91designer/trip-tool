@@ -2,7 +2,7 @@
 // 💾 DATA STORAGE & RESTORE HELPERS
 // -------------------------------------------------------------
 
-const CURRENT_DATA_VERSION = '2026-09-04-v7';
+const CURRENT_DATA_VERSION = '2026-09-06-v13-pure-itinerary';
 
 function saveData() {
     try {
@@ -22,6 +22,7 @@ function loadSavedState() {
         if (savedVersion !== CURRENT_DATA_VERSION) {
             window.placesDatabase = JSON.parse(JSON.stringify(OFFICIAL_DEFAULT_PLACES));
             window.itinerary = getOfficialDefaultItinerary();
+            window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
             saveData();
             return;
         }
@@ -55,7 +56,17 @@ function loadSavedState() {
             window.itinerary = getOfficialDefaultItinerary();
         }
 
-        if (savedWishlist) window.wishlist = JSON.parse(savedWishlist);
+        if (savedWishlist) {
+            const parsedWish = JSON.parse(savedWishlist);
+            if (Array.isArray(parsedWish) && parsedWish.length > 0) {
+                window.wishlist = parsedWish;
+            } else {
+                window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
+            }
+        } else {
+            window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
+        }
+
         if (savedSheetId) googleSheetId = savedSheetId;
         if (savedScriptUrl) googleAppsScriptUrl = savedScriptUrl;
         if (savedDriveUrl) googleDriveFolderUrl = savedDriveUrl;
@@ -63,12 +74,14 @@ function loadSavedState() {
         console.warn("Error restoring state, loading official defaults:", e);
         window.placesDatabase = JSON.parse(JSON.stringify(OFFICIAL_DEFAULT_PLACES));
         window.itinerary = getOfficialDefaultItinerary();
+        window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
     }
 }
 
 function restoreDefaultData() {
     window.placesDatabase = JSON.parse(JSON.stringify(OFFICIAL_DEFAULT_PLACES));
     window.itinerary = getOfficialDefaultItinerary();
+    window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
     saveData();
     if (typeof filterCategory === 'function') filterCategory('all');
     if (typeof renderPlaces === 'function') renderPlaces();

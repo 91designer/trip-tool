@@ -371,13 +371,21 @@ function processParsedSheetData(headers, rows) {
                 }
             });
 
+            // 🔄 僅在 Google 試算表項目與既有主線行程名稱相符時更新備註 (不自動注入未規劃之雜項)
             for (let d = 1; d <= 6; d++) {
-                if (sheetItinerary[d] && sheetItinerary[d].length > 0) {
-                    if (!window.itinerary[d]) window.itinerary[d] = [];
-                    sheetItinerary[d].forEach(sp => {
-                        if (!window.itinerary[d].some(p => p.name.trim().toLowerCase() === sp.name.trim().toLowerCase())) {
-                            window.itinerary[d].push(sp);
+                if (window.itinerary[d]) {
+                    window.itinerary[d] = window.itinerary[d].map(itItem => {
+                        const matchedSheetSpot = fetchedPlaces.find(sp => sp.name.trim().toLowerCase() === itItem.name.trim().toLowerCase());
+                        if (matchedSheetSpot) {
+                            return {
+                                ...itItem,
+                                sub: matchedSheetSpot.sub || itItem.sub,
+                                desc: matchedSheetSpot.desc || itItem.desc,
+                                lat: matchedSheetSpot.lat || itItem.lat,
+                                lng: matchedSheetSpot.lng || itItem.lng
+                            };
                         }
+                        return itItem;
                     });
                 }
             }
