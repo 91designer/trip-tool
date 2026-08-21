@@ -1,5 +1,5 @@
 // -------------------------------------------------------------
-// ⚙️ CONFIGURATION & IMMUTABLE DEFAULT DATASETS (2026-09-06 Master Baseline)
+// ⚙️ CONFIGURATION & IMMUTABLE DEFAULT DATASETS (2026-09-08 Day 3 Chainsaw Man & Day 5 Update)
 // -------------------------------------------------------------
 
 let googleSheetId = '1FDs9cPR0WjZv_HitON78zJS_dKNHzN46jrRtpV13ldQ';
@@ -29,23 +29,23 @@ const DEFAULT_PLACES = [
     { id: "day2-tyffonium-vr", category: "park", name: "🔮 台場 Tyffonium VR 沉浸體驗（預約 13:30–14:00）", sub: "預約 13:30–14:00 • DiverCity Tokyo", desc: "體驗次世代魔幻沉浸式 VR 探索，身歷其境的感官冒險旅程。", img: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=400&q=80", mapQuery: "Tyffonium Odaiba", lat: 35.6253, lng: 139.7755 },
     { id: "day2-aqua-park", category: "park", name: "🐬 品川水族館（Maxell Aqua Park）觀賞 19:00 夜間海豚秀與 19:45 水幕秀", sub: "19:00 海豚秀 • 19:45 水幕秀 • 港區高輪", desc: "結合絢麗光影音效與海洋生物，觀賞絕美夜間海豚秀與奇幻水幕燈光秀。", img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=400&q=80", mapQuery: "Maxell Aqua Park Shinagawa", lat: 35.6285, lng: 139.7386 },
 
-    // DAY 3 (09/06 日) - 最新哈利波特影城加回版時間軸
-    { id: "day3-kyudo-exp", category: "view", name: "🏹 日式弓道體驗（預約 08:45–11:15，千代田區）", sub: "08:45–11:15 • 千代田區 〒100-0005", desc: "換上日式道服，體驗傳統日本弓道的精神與射箭儀式（150 分鐘）。", img: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=400&q=80", mapQuery: "千代田區 弓道", lat: 35.6940, lng: 139.7538 },
-    { id: "day3-ippodo-matcha", category: "matcha", name: "🍵 採買一保堂茶鋪抹茶粉（東京丸之內店）", sub: "步行/採買 15 分鐘 • 千代田區丸之內", desc: "京都三百年老字號茶鋪，選購頂級濃茶與手作日式抹茶粉。", img: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80", mapQuery: "一保堂茶鋪 丸之內店", lat: 35.6780, lng: 139.7615 },
-    { id: "day3-harry-potter", category: "park", name: "🪄 東京華納兄弟哈利波特影城（建議預約 13:00–13:30）", sub: "12:15 午餐 ➔ 13:00–17:30 影城體驗 • 練馬區豐島園", desc: "搭乘電車至豐島園站，體驗霍格華茲大禮堂、九又四分之三月台、禁忌森林、斜角巷與品嚐奶油啤酒（270 分鐘）。", img: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=400&q=80", mapQuery: "東京哈利波特影城", lat: 35.7431, lng: 139.6465 },
-    { id: "day3-ikebukuro-sunshine", category: "shopping", name: "🛍️ 池袋太陽城 Sunshine City 深度爆買", sub: "18:00–20:30 • 池袋 Sunshine City", desc: "Workman Girl 機能防水防風外套 (太陽城 2F)、寶可夢中心 Mega Tokyo (2F)、萬代官方扭蛋總店 (3F) 與 Animate 池袋本店。", img: "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?auto=format&fit=crop&w=400&q=80", mapQuery: "Sunshine City Ikebukuro", lat: 35.7289, lng: 139.7193 },
-    { id: "day3-dinner-ikebukuro", category: "food", name: "🍜 晚宴：池袋知名拉麵或燒肉（麵處花田 / Izumo 鰻魚飯）", sub: "20:30~ 晚餐 • 池袋商圈", desc: "品嚐池袋超濃郁味噌拉麵「麵處花田」或巨無霸玉子燒鰻魚飯 Izumo 享用豐盛晚宴。", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=400&q=80", mapQuery: "麵處花田 池袋", lat: 35.7315, lng: 139.7155 },
+    // DAY 3 (09/06 日) - 最新《鏈鋸人》朝聖 & 弓道 & 哈利波特時間軸
+    { id: "day3-kyudo-exp", category: "view", name: "🏹 日式弓道體驗（預約 08:45–11:15，千代田區）", sub: "08:45–11:15 • 千代田區 〒100-0005", desc: "換上日式道服，體驗傳統日本弓道的精神與射箭儀式（150 分鐘，集合地點：〒100-0005）。", img: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=400&q=80", mapQuery: "千代田區 弓道", lat: 35.6940, lng: 139.7538 },
+    { id: "day3-chainsaw-man", category: "view", name: "🪚 《鏈鋸人》神保町朝聖漫步 & 採買一保堂抹茶粉", sub: "11:25–12:25 • 千代田區神保町/猿樂町", desc: "喫茶エル（松井大樓 1F 拍照）➔ 神保町 2-2-1 / 2-8 / 1-34 街景打卡（60 分鐘），順道採買一保堂茶鋪頂級抹茶粉。", img: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=400&q=80", mapQuery: "喫茶エル 神保町", lat: 35.6958, lng: 139.7578 },
+    { id: "day3-harry-potter", category: "park", name: "🪄 東京華納兄弟哈利波特影城（預約 13:00–13:30）", sub: "13:00–17:30 影城體驗 • 練馬區豐島園", desc: "12:25 搭地鐵直達「豐島園站」，體驗霍格華茲大禮堂、九又四分之三月台、禁忌森林、斜角巷與品嚐奶油啤酒（270 分鐘）。", img: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=400&q=80", mapQuery: "東京哈利波特影城", lat: 35.7431, lng: 139.6465 },
+    { id: "day3-ikebukuro-sunshine", category: "shopping", name: "🛍️ 池袋太陽城 Sunshine City 深度爆買", sub: "18:00–20:30 • 池袋 Sunshine City", desc: "17:30 搭西武線直達「池袋站」，爆買 Workman Girl 機能外套 (2F)、寶可夢中心 Mega Tokyo (2F)、萬代官方扭蛋總店 (3F) 與 Animate 池袋本店。", img: "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?auto=format&fit=crop&w=400&q=80", mapQuery: "Sunshine City Ikebukuro", lat: 35.7289, lng: 139.7193 },
+    { id: "day3-dinner-ikebukuro", category: "food", name: "🍜 晚宴：池袋知名美食晚宴（麵處花田 / Izumo 鰻魚飯）", sub: "20:30~ 晚餐 • 池袋商圈", desc: "享用池袋超濃郁味噌拉麵「麵處花田」或巨無霸玉子燒鰻魚飯 Izumo 享用豐盛晚宴。", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=400&q=80", mapQuery: "麵處花田 池袋", lat: 35.7315, lng: 139.7155 },
 
     // DAY 4 (09/07 一)
     { id: "day4-ghibli-museum", category: "park", name: "🍃 三鷹之森吉卜力美術館（預約 11:00 入場）", sub: "預約 11:00 入場 • 三鷹市下連雀", desc: "宮崎駿動畫的夢幻城堡，親眼目睹巨型天空之城機器人與龍貓巴士。", img: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=400&q=80", mapQuery: "三鷹之森吉卜力美術館", lat: 35.6963, lng: 139.5704 },
     { id: "day4-kichijoji-hikiniku", category: "food", name: "🌳 穿越井之頭公園至吉祥寺商圈散策（午餐：挽肉與米）", sub: "午餐 • 武藏野市吉祥寺", desc: "綠意公園散步，逛吉祥寺特色選品店，享用現烤「挽肉與米」和牛漢堡排。", img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=400&q=80", mapQuery: "井之頭恩賜公園", lat: 35.6997, lng: 139.5762 },
     { id: "day4-omotesando-shopping", category: "shopping", name: "👟 原宿與表參道採買（On / HOKA 跑鞋旗艦店、LE LABO 香水、AMAM DACOTAN 麵包）", sub: "下午 • 澀谷區神宮前", desc: "On / HOKA 跑鞋旗艦店、LE LABO 質感香水、AMAM DACOTAN 爆款排隊生麵包。", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80", mapQuery: "表參道", lat: 35.6672, lng: 139.7063 },
 
-    // DAY 5 (09/08 二)
-    { id: "day5-edo-museum", category: "view", name: "🏛️ 江戶東京建築園參觀", sub: "上午 • 小金井市關野町 1-7-5", desc: "漫步復古昭和與江戶開港懷舊建築群，體驗千與千尋場景靈感地。", img: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=400&q=80", mapQuery: "江戶東京建築園", lat: 35.7163, lng: 139.5126 },
-    { id: "day5-ginza-nihonbashi", category: "matcha", name: "🍵 日本橋與銀座巡禮（bakery bank 甜點、丸久小山園抹茶粉、LE LABO GINZA SIX）", sub: "下午 • bakery bank / 丸久小山園 / GINZA SIX", desc: "bakery bank 質感甜點、選購丸久小山園頂級抹茶粉、LE LABO GINZA SIX 專櫃。", img: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80", mapQuery: "GINZA SIX", lat: 35.6715, lng: 139.7650 },
-    { id: "day5-art-aquarium", category: "view", name: "🎨 銀座金魚美術館 ART AQUARIUM（銀座三越 8F，16:30–18:00）", sub: "16:30–18:00 • 銀座三越 8F", desc: "夢幻金魚燈光藝術展，結合日式傳統美學與現代沉浸燈光秀。", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=400&q=80", mapQuery: "ART AQUARIUM GINZA", lat: 35.6715, lng: 139.7650 },
-    { id: "day5-dinner-ginza", category: "food", name: "🥩 晚餐：銀座豬排 / 花山烏龍麵 / 人形町今半", sub: "晚餐 • 銀座 / 日本橋", desc: "享受極致寬麵花山烏龍麵、酥脆厚切豬排或百年壽喜燒老店人形町今半。", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80", mapQuery: "花山烏龍麵 銀座", lat: 35.6702, lng: 139.7675 },
+    // DAY 5 (09/08 二) - 最新建築園 & 日本橋銀座質感採買 (IQOS / LE LABO / 丸久小山園)
+    { id: "day5-edo-museum", category: "view", name: "🏛️ 江戶東京建築園參觀（小金井公園）", sub: "10:00–12:30 • 小金井市關野町 1-7-5", desc: "漫步復古昭和與江戶開港懷舊建築群，體驗千與千尋場景靈感地（搭 JR 中央線直達東京/日本橋 30 分鐘）。", img: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=400&q=80", mapQuery: "江戶東京建築園", lat: 35.7163, lng: 139.5126 },
+    { id: "day5-ginza-nihonbashi", category: "shopping", name: "🍵 日本橋 & 銀座質感採買與巡禮（bakery bank / 丸久小山園 / LE LABO / IQOS）", sub: "13:10–16:15 • 日本橋 & 銀座二丁目", desc: "bakery bank / Pâtisserie ease 頂級甜點、丸久小山園（銀座三越 B2F 抹茶粉）、LE LABO GINZA SIX 店、IQOS 銀座店（銀座二丁目）。", img: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80", mapQuery: "GINZA SIX", lat: 35.6715, lng: 139.7650 },
+    { id: "day5-art-aquarium", category: "view", name: "🎨 銀座金魚美術館 ART AQUARIUM GINZA", sub: "16:30–18:00 • 銀座三越 8F", desc: "夢幻金魚燈光藝術展，結合日式傳統美學與現代沉浸燈光秀（銀座三越 8F）。", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=400&q=80", mapQuery: "ART AQUARIUM GINZA", lat: 35.6715, lng: 139.7650 },
+    { id: "day5-dinner-ginza", category: "food", name: "🥩 晚餐：銀座知名料理晚宴（Tonkatsu Aoki 炸豬排 / 五代目花山烏龍麵）", sub: "18:30~ 晚餐 • 銀座 / 日本橋", desc: "品嚐 Tonkatsu Aoki 酥脆厚切炸豬排、五代目花山極致寬麵烏龍麵或百年壽喜燒人形町今半。", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80", mapQuery: "花山烏龍麵 銀座", lat: 35.6702, lng: 139.7675 },
 
     // DAY 6 (09/09 三)
     { id: "day6-kimono-asakusa", category: "shrine", name: "👘 淺草月見和服/浴衣換裝與淺草神社合照（預約 09:00）", sub: "預約 09:00 • 淺草神社合照", desc: "換上精緻日式浴衣/和服，前往淺草神社與被官稻荷神社參拜拍照。", img: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=400&q=80", mapQuery: "淺草神社", lat: 35.7153, lng: 139.7968 },
@@ -58,9 +58,9 @@ const DEFAULT_PLACES = [
 const DAY_TITLES = {
     1: "🗓️ 09/04 (五) Day 1：落地入境 ➔ 淺草夜巡 ➔ 觀光巴士 ➔ 豐洲溫泉",
     2: "🗓️ 09/05 (六) Day 2：潮見龍宮社 ➔ 台場 VR ➔ 品川水族館夜間秀",
-    3: "🗓️ 09/06 (日) Day 3：弓道體驗 ➔ 哈利波特影城 ➔ 池袋太陽城爆買",
+    3: "🗓️ 09/06 (日) Day 3：弓道體驗 ➔ 鏈鋸人朝聖 ➔ 哈利波特影城 ➔ 池袋太陽城爆買",
     4: "🗓️ 09/07 (一) Day 4：吉卜力美術館 ➔ 吉祥寺 ➔ 表參道與原宿",
-    5: "🗓️ 09/08 (二) Day 5：江戶東京建築園 ➔ 銀座/日本橋 ➔ 金魚美術館",
+    5: "🗓️ 09/08 (二) Day 5：江戶東京建築園 ➔ 日本橋/銀座採買 ➔ 金魚美術館 ➔ 銀座晚宴",
     6: "🗓️ 09/09 (三) Day 6：淺草浴衣 ➔ 貓頭鷹咖啡 ➔ 洗錢神社 ➔ 晴空塔 ➔ 返台"
 };
 
@@ -70,10 +70,12 @@ const DEFAULT_WISHLIST = [
     { text: "🎟️ [D2 體驗預約] 台場 Tyffonium VR 沉浸體驗 (預約 13:30–14:00)", done: false },
     { text: "🎟️ [D2 門票預訂] 品川水族館 Maxell Aqua Park 夜間秀門票", done: false },
     { text: "🎟️ [D3 體驗預約] 千代田區 日式弓道體驗 (預約 08:45–11:15)", done: false },
+    { text: "🎟️ [D3 聖地巡禮] 《鏈鋸人》神保町朝聖 (喫茶エル / 街景打卡)", done: false },
     { text: "🎟️ [D3 門票預約] 東京華納兄弟哈利波特影城 (預約 13:00–13:30)", done: false },
     { text: "🎟️ [D4 門票預約] 三鷹之森吉卜力美術館 (預約 11:00 入場)", done: false },
     { text: "🎟️ [D4 整理券/預約] 吉祥寺 挽肉與米 現烤和牛漢堡排", done: false },
     { text: "🎟️ [D5 門票預訂] 銀座金魚美術館 ART AQUARIUM 門票 (16:30–18:00)", done: false },
+    { text: "🎟️ [D5 質感採買] IQOS 銀座店 / LE LABO GINZA SIX / 丸久小山園", done: false },
     { text: "🎟️ [D6 體驗預約] 淺草月見和服/浴衣換裝 (預約 09:00)", done: false },
     { text: "🎟️ [D6 門票預約] 秋葉原貓頭鷹咖啡館 (Akiba Fukurou)", done: false }
 ];

@@ -2,7 +2,7 @@
 // 💾 DATA STORAGE & RESTORE HELPERS
 // -------------------------------------------------------------
 
-const CURRENT_DATA_VERSION = '2026-09-06-v13-pure-itinerary';
+const CURRENT_DATA_VERSION = '2026-09-08-v14-chainsaw-iqos';
 
 function saveData() {
     try {
