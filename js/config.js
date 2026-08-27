@@ -102,9 +102,36 @@ function getOfficialDefaultWishlist() {
     return JSON.parse(JSON.stringify(DEFAULT_WISHLIST));
 }
 
+// ✈️ 🏨 機票與住宿可編輯預設資料 (FLIGHT & ACCOMMODATION DATASET)
+const DEFAULT_FLIGHT_HOTEL_INFO = {
+    flightTitle: "樂桃航空來回機票",
+    flightOutbound: "🛫 去程 09/04 (五)：10:50 TPE ➔ 15:20 NRT T1 (MM626)",
+    flightInbound: "🛬 回程 09/09 (三)：22:15 NRT T1 ➔ 01:00+1 TPE (MM627)",
+    hotelName: "東京都葛飾區打花茶屋 (お花茶屋)",
+    hotelSub: "入住 09/04–09/09 (5 晚) • 京成本線極速直達",
+    hotelMapUrl: "https://goo.gl/maps/a9e5uZQNwStHhWUK8?g_st=al"
+};
+
+function getOfficialDefaultFlightHotelInfo() {
+    return JSON.parse(JSON.stringify(DEFAULT_FLIGHT_HOTEL_INFO));
+}
+
+// 📅 ⏳ 旅遊日期與總天數可編輯資料 (TRIP CONFIG DATASET)
+const DEFAULT_TRIP_CONFIG = {
+    startDate: '2026-09-04',
+    totalDays: 6,
+    customDayTitles: {}
+};
+
+function getOfficialDefaultTripConfig() {
+    return JSON.parse(JSON.stringify(DEFAULT_TRIP_CONFIG));
+}
+
 window.placesDatabase = JSON.parse(JSON.stringify(OFFICIAL_DEFAULT_PLACES));
 window.itinerary = getOfficialDefaultItinerary();
 window.wishlist = getOfficialDefaultWishlist();
+window.flightHotelInfo = getOfficialDefaultFlightHotelInfo();
+window.tripConfig = getOfficialDefaultTripConfig();
 
 let currentCategory = 'all';
 let currentDay = 1;

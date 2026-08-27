@@ -33,16 +33,62 @@ function getCleanPlaceName(place) {
     return nameStr;
 }
 
+function getDayTitle(dayNum) {
+    if (window.tripConfig && window.tripConfig.customDayTitles && window.tripConfig.customDayTitles[dayNum]) {
+        return window.tripConfig.customDayTitles[dayNum];
+    }
+    if (typeof DAY_TITLES !== 'undefined' && DAY_TITLES[dayNum]) {
+        return DAY_TITLES[dayNum];
+    }
+    
+    const startDateStr = (window.tripConfig && window.tripConfig.startDate) ? window.tripConfig.startDate : '2026-09-04';
+    try {
+        const parts = startDateStr.split('-');
+        if (parts.length === 3) {
+            const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            date.setDate(date.getDate() + (dayNum - 1));
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekDay = weekDays[date.getDay()];
+            return `🗓️ ${month}/${day} (${weekDay}) Day ${dayNum} 冒險行程`;
+        }
+    } catch(e){}
+    return `🗓️ Day ${dayNum} 冒險行程`;
+}
+
+function renderDayTabs() {
+    const container = document.getElementById('dayTabsContainer');
+    if (!container) return;
+
+    const totalDays = (window.tripConfig && window.tripConfig.totalDays) ? window.tripConfig.totalDays : 6;
+
+    let html = '';
+    for (let d = 1; d <= totalDays; d++) {
+        const isActive = d === currentDay;
+        const btnClass = isActive 
+            ? 'px-2.5 py-1 bg-amber-500 text-slate-950 font-bold border border-amber-300 rounded shrink-0'
+            : 'px-2.5 py-1 bg-slate-800 text-slate-300 border border-slate-600 rounded hover:bg-slate-700 shrink-0';
+        html += `<button onclick="playSfx('click'); selectDay(${d})" id="dayBtn-${d}" class="${btnClass}">D${d}</button>`;
+    }
+    container.innerHTML = html;
+}
+
 function selectDay(day) {
     currentDay = day;
-    [1, 2, 3, 4, 5, 6].forEach(d => {
+    const totalDays = (window.tripConfig && window.tripConfig.totalDays) ? window.tripConfig.totalDays : 6;
+    for (let d = 1; d <= totalDays; d++) {
         const btn = document.getElementById(`dayBtn-${d}`);
-        if (btn) btn.className = (d === day) ? "px-2.5 py-1 bg-amber-500 text-slate-950 font-bold border border-amber-300 rounded shrink-0" : "px-2.5 py-1 bg-slate-800 text-slate-300 border border-slate-600 rounded hover:bg-slate-700 shrink-0";
-    });
+        if (btn) {
+            btn.className = (d === day) 
+                ? "px-2.5 py-1 bg-amber-500 text-slate-950 font-bold border border-amber-300 rounded shrink-0" 
+                : "px-2.5 py-1 bg-slate-800 text-slate-300 border border-slate-600 rounded hover:bg-slate-700 shrink-0";
+        }
+    }
     
     const titleEl = document.getElementById('currentDayTitle');
     if (titleEl) {
-        titleEl.textContent = DAY_TITLES[day] || `🗓️ 第 ${day} 天冒險計畫`;
+        titleEl.textContent = getDayTitle(day);
     }
 
     renderItinerary();
@@ -127,9 +173,9 @@ function renderPlaces() {
                             <i class="fa-solid fa-location-arrow"></i> 導航
                         </a>
                     </div>
-                    <div class="flex items-center gap-1 font-pixel-en text-[10px]">
-                        <span class="text-slate-400 mr-0.5">裝備至:</span>
-                        ${[1,2,3,4,5,6].map(d => `<button onclick="addToItinerary('${safeId}', ${d})" class="px-1 py-0.5 bg-sky-950 border border-sky-600 text-sky-300 rounded hover:bg-sky-800">D${d}</button>`).join('')}
+                    <div class="flex items-center gap-1 font-pixel-en text-[10px] overflow-x-auto">
+                        <span class="text-slate-400 mr-0.5 shrink-0">裝備至:</span>
+                        ${Array.from({length: (window.tripConfig && window.tripConfig.totalDays) ? window.tripConfig.totalDays : 6}, (_, i) => i + 1).map(d => `<button onclick="addToItinerary('${safeId}', ${d})" class="px-1 py-0.5 bg-sky-950 border border-sky-600 text-sky-300 rounded hover:bg-sky-800 shrink-0">D${d}</button>`).join('')}
                     </div>
                 </div>
             </div>
@@ -502,4 +548,194 @@ function deleteWishlistItem(idx) {
     saveData();
     renderWishlist();
     if (typeof playSfx === 'function') playSfx('delete');
+}
+
+// -------------------------------------------------------------
+// 🛡️ STARTUP ITINERARY SELECTION MODAL CONTROLS
+// -------------------------------------------------------------
+
+function openStartupChoiceModal() {
+    const modal = document.getElementById('startupChoiceModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        if (typeof playSfx === 'function') playSfx('click');
+    }
+}
+
+function closeStartupChoiceModal() {
+    const modal = document.getElementById('startupChoiceModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+async function selectStartupOption(type) {
+    try {
+        localStorage.setItem('tokyo_quest_startup_chosen', 'true');
+    } catch(e){}
+    
+    if (type === 'default') {
+        restoreDefaultData();
+        renderDayTabs();
+        selectDay(1);
+        closeStartupChoiceModal();
+        if (typeof showCustomAlert === 'function') showCustomAlert('已成功載入預設 6 日冒險行程！', '🛡️');
+    } else if (type === 'custom') {
+        const startDateEl = document.getElementById('customStartDateInput');
+        const totalDaysEl = document.getElementById('customTotalDaysInput');
+        const input = document.getElementById('customSheetIdInput');
+
+        const startDate = startDateEl ? startDateEl.value : '2026-09-04';
+        const totalDays = totalDaysEl ? (parseInt(totalDaysEl.value, 10) || 6) : 6;
+        const customId = input ? input.value.trim() : '';
+
+        window.tripConfig = {
+            startDate: startDate,
+            totalDays: totalDays,
+            customDayTitles: {}
+        };
+
+        if (!window.itinerary) window.itinerary = {};
+        for (let d = 1; d <= totalDays; d++) {
+            if (!window.itinerary[d]) window.itinerary[d] = [];
+        }
+
+        if (customId) {
+            googleSheetId = customId;
+        }
+
+        saveData();
+        renderDayTabs();
+        selectDay(1);
+        renderPlaces();
+        closeStartupChoiceModal();
+        
+        if (customId) {
+            if (typeof showCustomAlert === 'function') showCustomAlert('正在從試算表載入您的自訂行程...', '🔄');
+            if (typeof syncFromGoogleSheet === 'function') {
+                await syncFromGoogleSheet();
+            }
+        } else {
+            if (typeof showCustomAlert === 'function') showCustomAlert(`已建立 ${startDate} 出發，共 ${totalDays} 天的專屬行程！`, '📅');
+        }
+    }
+}
+
+// -------------------------------------------------------------
+// ✈️ 🏨 EDITABLE FLIGHT & ACCOMMODATION BANNER CONTROLS
+// -------------------------------------------------------------
+
+function updateFlightHotelField(field, value) {
+    if (!window.flightHotelInfo) {
+        window.flightHotelInfo = typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {};
+    }
+    window.flightHotelInfo[field] = value;
+    saveData();
+
+    if (field === 'hotelMapUrl') {
+        const btn = document.getElementById('hotelNavBtn');
+        if (btn) btn.href = value || '#';
+    }
+}
+
+function renderFlightHotelBanner() {
+    const container = document.getElementById('flightHotelBannerContainer');
+    if (!container) return;
+
+    const info = window.flightHotelInfo || (typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {});
+
+    container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-1">
+            <!-- LEFT: FLIGHT INFO -->
+            <div class="pixel-box-gold p-2.5 rounded text-xs font-pixel-jp shadow-md flex flex-col justify-between space-y-1.5">
+                <div class="flex items-center justify-between border-b border-amber-800/80 pb-1">
+                    <span class="font-bold text-amber-400 text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-plane-departure text-amber-400"></i> ${info.flightTitle || '樂桃航空來回機票'}
+                    </span>
+                    <button onclick="openFlightHotelModal()" class="pixel-btn text-[10px] py-0.5 px-1.5 text-amber-300 border-amber-600 flex items-center gap-0.5 font-bold" title="開啟編輯視窗">
+                        <i class="fa-solid fa-pen-to-square"></i> 編輯
+                    </button>
+                </div>
+                <div class="space-y-1 text-amber-200/90 text-[11px]">
+                    <div class="flex items-center justify-between bg-slate-900/60 p-1 rounded border border-amber-900/40">
+                        <input type="text" value="${(info.flightOutbound || '').replace(/"/g, '&quot;')}" oninput="updateFlightHotelField('flightOutbound', this.value)" class="w-full bg-transparent border-b border-transparent focus:border-amber-400 text-amber-300 font-pixel-jp text-[11px] focus:outline-none focus:bg-slate-950/80 px-1 py-0.5" title="點擊可自由修改去程班機資訊">
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-900/60 p-1 rounded border border-amber-900/40">
+                        <input type="text" value="${(info.flightInbound || '').replace(/"/g, '&quot;')}" oninput="updateFlightHotelField('flightInbound', this.value)" class="w-full bg-transparent border-b border-transparent focus:border-amber-400 text-amber-300 font-pixel-jp text-[11px] focus:outline-none focus:bg-slate-950/80 px-1 py-0.5" title="點擊可自由修改回程班機資訊">
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: ACCOMMODATION INFO -->
+            <div class="pixel-box-gold p-2.5 rounded text-xs font-pixel-jp shadow-md flex flex-col justify-between space-y-1.5">
+                <div class="flex items-center justify-between border-b border-amber-800/80 pb-1">
+                    <span class="font-bold text-emerald-400 text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-hotel text-emerald-400"></i> 🏨 住宿據點 (5 NIGHTS STAY)
+                    </span>
+                    <button onclick="openFlightHotelModal()" class="pixel-btn text-[10px] py-0.5 px-1.5 text-emerald-300 border-emerald-600 flex items-center gap-0.5 font-bold" title="開啟編輯視窗">
+                        <i class="fa-solid fa-pen-to-square"></i> 編輯
+                    </button>
+                </div>
+                <div class="flex items-center justify-between gap-2 bg-slate-900/60 p-1.5 rounded border border-emerald-900/40">
+                    <div class="space-y-0.5 min-w-0 flex-1">
+                        <input type="text" value="${(info.hotelName || '').replace(/"/g, '&quot;')}" oninput="updateFlightHotelField('hotelName', this.value)" class="w-full bg-transparent border-b border-transparent focus:border-emerald-400 text-emerald-300 font-bold text-xs font-pixel-jp focus:outline-none focus:bg-slate-950/80 px-1 py-0.5" title="點擊可自由修改飯店名稱">
+                        <input type="text" value="${(info.hotelSub || '').replace(/"/g, '&quot;')}" oninput="updateFlightHotelField('hotelSub', this.value)" class="w-full bg-transparent border-b border-transparent focus:border-emerald-400 text-slate-300 text-[10px] font-pixel-jp focus:outline-none focus:bg-slate-950/80 px-1 py-0.5" title="點擊可自由修改住宿時間與備註">
+                    </div>
+                    <a id="hotelNavBtn" href="${info.hotelMapUrl || '#'}" target="_blank" rel="noopener noreferrer" class="pixel-btn pixel-btn-green text-[10px] py-1 px-2 flex items-center gap-1 font-bold shrink-0" title="開啟 Google Maps 導航">
+                        <i class="fa-solid fa-location-dot"></i> 導航
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function openFlightHotelModal() {
+    const modal = document.getElementById('flightHotelModal');
+    if (!modal) return;
+
+    const info = window.flightHotelInfo || (typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {});
+
+    const titleEl = document.getElementById('fhModalTitle');
+    const outboundEl = document.getElementById('fhModalOutbound');
+    const inboundEl = document.getElementById('fhModalInbound');
+    const hotelNameEl = document.getElementById('fhModalHotelName');
+    const hotelSubEl = document.getElementById('fhModalHotelSub');
+    const hotelMapUrlEl = document.getElementById('fhModalHotelMapUrl');
+
+    if (titleEl) titleEl.value = info.flightTitle || '';
+    if (outboundEl) outboundEl.value = info.flightOutbound || '';
+    if (inboundEl) inboundEl.value = info.flightInbound || '';
+    if (hotelNameEl) hotelNameEl.value = info.hotelName || '';
+    if (hotelSubEl) hotelSubEl.value = info.hotelSub || '';
+    if (hotelMapUrlEl) hotelMapUrlEl.value = info.hotelMapUrl || '';
+
+    modal.classList.remove('hidden');
+    if (typeof playSfx === 'function') playSfx('click');
+}
+
+function closeFlightHotelModal() {
+    const modal = document.getElementById('flightHotelModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function saveFlightHotelModal() {
+    const titleEl = document.getElementById('fhModalTitle');
+    const outboundEl = document.getElementById('fhModalOutbound');
+    const inboundEl = document.getElementById('fhModalInbound');
+    const hotelNameEl = document.getElementById('fhModalHotelName');
+    const hotelSubEl = document.getElementById('fhModalHotelSub');
+    const hotelMapUrlEl = document.getElementById('fhModalHotelMapUrl');
+
+    window.flightHotelInfo = {
+        flightTitle: titleEl ? titleEl.value.trim() : '樂桃航空來回機票',
+        flightOutbound: outboundEl ? outboundEl.value.trim() : '',
+        flightInbound: inboundEl ? inboundEl.value.trim() : '',
+        hotelName: hotelNameEl ? hotelNameEl.value.trim() : '',
+        hotelSub: hotelSubEl ? hotelSubEl.value.trim() : '',
+        hotelMapUrl: hotelMapUrlEl ? hotelMapUrlEl.value.trim() : ''
+    };
+
+    saveData();
+    renderFlightHotelBanner();
+    closeFlightHotelModal();
+    if (typeof showCustomAlert === 'function') showCustomAlert('機票與住宿資訊已成功儲存！', '✈️');
 }

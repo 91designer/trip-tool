@@ -2,13 +2,15 @@
 // 💾 DATA STORAGE & RESTORE HELPERS
 // -------------------------------------------------------------
 
-const CURRENT_DATA_VERSION = '2026-09-08-v14-chainsaw-iqos';
+const CURRENT_DATA_VERSION = '2026-09-08-v16-trip-dates';
 
 function saveData() {
     try {
         localStorage.setItem('tokyo_quest_places', JSON.stringify(window.placesDatabase));
         localStorage.setItem('tokyo_quest_itinerary', JSON.stringify(window.itinerary));
         localStorage.setItem('tokyo_quest_wishlist', JSON.stringify(window.wishlist));
+        localStorage.setItem('tokyo_quest_flight_hotel', JSON.stringify(window.flightHotelInfo));
+        localStorage.setItem('tokyo_quest_trip_config', JSON.stringify(window.tripConfig));
         localStorage.setItem('tokyo_quest_sheet_id', googleSheetId);
         localStorage.setItem('tokyo_quest_apps_script_url', googleAppsScriptUrl);
         localStorage.setItem('tokyo_quest_drive_folder_url', googleDriveFolderUrl);
@@ -23,6 +25,8 @@ function loadSavedState() {
             window.placesDatabase = JSON.parse(JSON.stringify(OFFICIAL_DEFAULT_PLACES));
             window.itinerary = getOfficialDefaultItinerary();
             window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
+            window.flightHotelInfo = typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {};
+            window.tripConfig = typeof getOfficialDefaultTripConfig === 'function' ? getOfficialDefaultTripConfig() : {};
             saveData();
             return;
         }
@@ -30,15 +34,21 @@ function loadSavedState() {
         const savedPlaces = localStorage.getItem('tokyo_quest_places');
         const savedItinerary = localStorage.getItem('tokyo_quest_itinerary');
         const savedWishlist = localStorage.getItem('tokyo_quest_wishlist');
+        const savedFlightHotel = localStorage.getItem('tokyo_quest_flight_hotel');
+        const savedTripConfig = localStorage.getItem('tokyo_quest_trip_config');
         const savedSheetId = localStorage.getItem('tokyo_quest_sheet_id');
         const savedScriptUrl = localStorage.getItem('tokyo_quest_apps_script_url');
         const savedDriveUrl = localStorage.getItem('tokyo_quest_drive_folder_url');
 
         if (savedPlaces) {
-            const parsedPlaces = JSON.parse(savedPlaces);
-            if (Array.isArray(parsedPlaces) && parsedPlaces.length > 0 && parsedPlaces[0] && parsedPlaces[0].name) {
-                window.placesDatabase = parsedPlaces;
-            } else {
+            try {
+                const parsedPlaces = JSON.parse(savedPlaces);
+                if (Array.isArray(parsedPlaces) && parsedPlaces.length > 0 && parsedPlaces[0] && parsedPlaces[0].name) {
+                    window.placesDatabase = parsedPlaces;
+                } else {
+                    window.placesDatabase = JSON.parse(JSON.stringify(OFFICIAL_DEFAULT_PLACES));
+                }
+            } catch(e) {
                 window.placesDatabase = JSON.parse(JSON.stringify(OFFICIAL_DEFAULT_PLACES));
             }
         } else {
@@ -46,10 +56,17 @@ function loadSavedState() {
         }
 
         if (savedItinerary) {
-            const parsedIt = JSON.parse(savedItinerary);
-            if (parsedIt && typeof parsedIt === 'object' && parsedIt[1]) {
-                window.itinerary = parsedIt;
-            } else {
+            try {
+                const parsedIt = JSON.parse(savedItinerary);
+                const count = (parsedIt && typeof parsedIt === 'object') 
+                    ? Object.values(parsedIt).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0) 
+                    : 0;
+                if (count > 0) {
+                    window.itinerary = parsedIt;
+                } else {
+                    window.itinerary = getOfficialDefaultItinerary();
+                }
+            } catch(e) {
                 window.itinerary = getOfficialDefaultItinerary();
             }
         } else {
@@ -67,6 +84,26 @@ function loadSavedState() {
             window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
         }
 
+        if (savedFlightHotel) {
+            try {
+                window.flightHotelInfo = JSON.parse(savedFlightHotel);
+            } catch(e) {
+                window.flightHotelInfo = typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {};
+            }
+        } else {
+            window.flightHotelInfo = typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {};
+        }
+
+        if (savedTripConfig) {
+            try {
+                window.tripConfig = JSON.parse(savedTripConfig);
+            } catch(e) {
+                window.tripConfig = typeof getOfficialDefaultTripConfig === 'function' ? getOfficialDefaultTripConfig() : {};
+            }
+        } else {
+            window.tripConfig = typeof getOfficialDefaultTripConfig === 'function' ? getOfficialDefaultTripConfig() : {};
+        }
+
         if (savedSheetId) googleSheetId = savedSheetId;
         if (savedScriptUrl) googleAppsScriptUrl = savedScriptUrl;
         if (savedDriveUrl) googleDriveFolderUrl = savedDriveUrl;
@@ -75,6 +112,8 @@ function loadSavedState() {
         window.placesDatabase = JSON.parse(JSON.stringify(OFFICIAL_DEFAULT_PLACES));
         window.itinerary = getOfficialDefaultItinerary();
         window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
+        window.flightHotelInfo = typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {};
+        window.tripConfig = typeof getOfficialDefaultTripConfig === 'function' ? getOfficialDefaultTripConfig() : {};
     }
 }
 
@@ -82,6 +121,8 @@ function restoreDefaultData() {
     window.placesDatabase = JSON.parse(JSON.stringify(OFFICIAL_DEFAULT_PLACES));
     window.itinerary = getOfficialDefaultItinerary();
     window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
+    window.flightHotelInfo = typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {};
+    window.tripConfig = typeof getOfficialDefaultTripConfig === 'function' ? getOfficialDefaultTripConfig() : {};
     saveData();
     if (typeof filterCategory === 'function') filterCategory('all');
     if (typeof renderPlaces === 'function') renderPlaces();

@@ -371,22 +371,33 @@ function processParsedSheetData(headers, rows) {
                 }
             });
 
-            // 🔄 僅在 Google 試算表項目與既有主線行程名稱相符時更新備註 (不自動注入未規劃之雜項)
-            for (let d = 1; d <= 6; d++) {
-                if (window.itinerary[d]) {
-                    window.itinerary[d] = window.itinerary[d].map(itItem => {
-                        const matchedSheetSpot = fetchedPlaces.find(sp => sp.name.trim().toLowerCase() === itItem.name.trim().toLowerCase());
-                        if (matchedSheetSpot) {
-                            return {
-                                ...itItem,
-                                sub: matchedSheetSpot.sub || itItem.sub,
-                                desc: matchedSheetSpot.desc || itItem.desc,
-                                lat: matchedSheetSpot.lat || itItem.lat,
-                                lng: matchedSheetSpot.lng || itItem.lng
-                            };
-                        }
-                        return itItem;
-                    });
+            // 🔄 僅在 Google 試算表項目與既有主線行程名稱相符時更新備註 (若目前完全空白則自動帶入)
+            const currentItCount = Object.values(window.itinerary || {}).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
+            const totalDays = (window.tripConfig && window.tripConfig.totalDays) ? window.tripConfig.totalDays : 6;
+            
+            if (currentItCount === 0) {
+                for (let d = 1; d <= totalDays; d++) {
+                    if (sheetItinerary[d] && sheetItinerary[d].length > 0) {
+                        window.itinerary[d] = sheetItinerary[d];
+                    }
+                }
+            } else {
+                for (let d = 1; d <= totalDays; d++) {
+                    if (window.itinerary[d]) {
+                        window.itinerary[d] = window.itinerary[d].map(itItem => {
+                            const matchedSheetSpot = fetchedPlaces.find(sp => sp.name.trim().toLowerCase() === itItem.name.trim().toLowerCase());
+                            if (matchedSheetSpot) {
+                                return {
+                                    ...itItem,
+                                    sub: matchedSheetSpot.sub || itItem.sub,
+                                    desc: matchedSheetSpot.desc || itItem.desc,
+                                    lat: matchedSheetSpot.lat || itItem.lat,
+                                    lng: matchedSheetSpot.lng || itItem.lng
+                                };
+                            }
+                            return itItem;
+                        });
+                    }
                 }
             }
 
