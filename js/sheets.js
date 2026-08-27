@@ -154,6 +154,38 @@ async function fetchViaCORSProxy(sheetId, isSilent) {
 }
 
 // 智慧與寬鬆防呆表格解析機器 (1. 堅持使用真實地點名稱; 2. 徹底隔離/安全化 Sheet 代碼避免影響系統執行)
+function normalizePlaceNameForComparison(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/[\u1F600-\u1F64F\u1F300-\u1F5FF\u1F680-\u1F6FF\u1F1E0-\u1F1FF\u2600-\u26FF\u2700-\u27BF\uFE0F]/g, '')
+        .replace(/[^\w\u4e00-\u9fa5]/g, '')
+        .toLowerCase();
+}
+
+function isSamePlace(nameA, nameB) {
+    const cleanA = normalizePlaceNameForComparison(nameA);
+    const cleanB = normalizePlaceNameForComparison(nameB);
+    if (!cleanA || !cleanB) return false;
+    if (cleanA === cleanB) return true;
+    if (cleanA.length > 4 && cleanB.length > 4) {
+        if (cleanA.includes(cleanB) || cleanB.includes(cleanA)) return true;
+    }
+    return false;
+}
+
+function formatDirectImageUrl(url) {
+    if (!url) return '';
+    const str = String(url).trim();
+    if (!str.startsWith('http://') && !str.startsWith('https://')) return '';
+
+    const driveMatch = str.match(/\/d\/([a-zA-Z0-9-_]+)/) || str.match(/[?&]id=([a-zA-Z0-9-_]+)/);
+    if (driveMatch && (str.includes('drive.google.com') || str.includes('googleusercontent.com'))) {
+        return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+    }
+
+    return str;
+}
+
 function processParsedSheetData(headers, rows) {
     if (!rows || rows.length === 0) return { count: 0, names: [] };
 
@@ -311,8 +343,10 @@ function processParsedSheetData(headers, rows) {
                     if (num > 130 && num < 145 && !lng) lng = num;
                 }
 
-                if (/^https?:\/\/.*\.(jpeg|jpg|gif|png|webp)/i.test(str) && !img) {
-                    img = str;
+                if (!img && (cellIdx === imgIdx || /^https?:\/\//i.test(str))) {
+                    if (/drive\.google\.com|googleusercontent\.com|\.(jpeg|jpg|png|webp|gif)|images\.unsplash|imgur|photo/i.test(str)) {
+                        img = formatDirectImageUrl(str);
+                    }
                 }
             });
 
@@ -356,10 +390,8 @@ function processParsedSheetData(headers, rows) {
             if (!Array.isArray(window.placesDatabase)) window.placesDatabase = [];
 
             fetchedPlaces.forEach(newSpot => {
-                const existingIdx = window.placesDatabase.findIndex(p => p.name.trim().toLowerCase() === newSpot.name.trim().toLowerCase());
-                if (existingIdx === -1) {
-                    window.placesDatabase.unshift(newSpot);
-                } else {
+                const existingIdx = window.placesDatabase.findIndex(p => isSamePlace(p.name, newSpot.name));
+                if (existingIdx !== -1) {
                     window.placesDatabase[existingIdx] = {
                         ...window.placesDatabase[existingIdx],
                         code: newSpot.code || window.placesDatabase[existingIdx].code,
@@ -368,8 +400,18 @@ function processParsedSheetData(headers, rows) {
                         lat: newSpot.lat || window.placesDatabase[existingIdx].lat,
                         lng: newSpot.lng || window.placesDatabase[existingIdx].lng
                     };
+                } else {
+                    window.placesDatabase.unshift(newSpot);
                 }
             });
+
+            // 🛡️ 自動防呆去重：確保素材庫中絕不包含重複名稱之景點
+            const uniquePlaces = [];
+            window.placesDatabase.forEach(p => {
+                const exists = uniquePlaces.some(u => isSamePlace(u.name, p.name));
+                if (!exists) uniquePlaces.push(p);
+            });
+            window.placesDatabase = uniquePlaces;
 
             // 🔄 僅在 Google 試算表項目與既有主線行程名稱相符時更新備註 (若目前完全空白則自動帶入)
             const currentItCount = Object.values(window.itinerary || {}).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
@@ -385,7 +427,7 @@ function processParsedSheetData(headers, rows) {
                 for (let d = 1; d <= totalDays; d++) {
                     if (window.itinerary[d]) {
                         window.itinerary[d] = window.itinerary[d].map(itItem => {
-                            const matchedSheetSpot = fetchedPlaces.find(sp => sp.name.trim().toLowerCase() === itItem.name.trim().toLowerCase());
+                            const matchedSheetSpot = fetchedPlaces.find(sp => isSamePlace(sp.name, itItem.name));
                             if (matchedSheetSpot) {
                                 return {
                                     ...itItem,

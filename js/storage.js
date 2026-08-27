@@ -2,7 +2,7 @@
 // 💾 DATA STORAGE & RESTORE HELPERS
 // -------------------------------------------------------------
 
-const CURRENT_DATA_VERSION = '2026-09-08-v16-trip-dates';
+const CURRENT_DATA_VERSION = '2026-09-08-v17-dedup';
 
 function saveData() {
     try {

@@ -253,3 +253,85 @@ function closeBudgetModal() {
     const modal = document.getElementById('budgetModal');
     if (modal) modal.classList.add('hidden');
 }
+
+function exportBudgetCSV() {
+    if (!budgetState.expenses || budgetState.expenses.length === 0) {
+        if (typeof showCustomAlert === 'function') showCustomAlert('尚無記帳資料可匯出！', '⚠️');
+        return;
+    }
+
+    let csvContent = '\uFEFF'; // UTF-8 BOM for Windows Excel
+    csvContent += '天數,消費品項,類別,支付方式,日幣金額(JPY),換算台幣(TWD)\n';
+
+    budgetState.expenses.forEach(item => {
+        const catInfo = BUDGET_CATEGORIES[item.category] || BUDGET_CATEGORIES.other;
+        const twdVal = calculateItemTwd(item.amountJpy, item.paymentMethod);
+        const dayStr = item.day ? `Day ${item.day}` : '未指定';
+        let payStr = '現金';
+        if (item.paymentMethod === 'card') payStr = `信用卡(+${budgetState.cardFeePercent}%)`;
+        else if (item.paymentMethod === 'ic') payStr = 'IC卡';
+
+        const titleEscaped = `"${(item.title || '').replace(/"/g, '""')}"`;
+        const catEscaped = `"${catInfo.label}"`;
+        const payEscaped = `"${payStr}"`;
+
+        csvContent += `${dayStr},${titleEscaped},${catEscaped},${payEscaped},${item.amountJpy},${twdVal}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tokyo_trip_expenses_${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    if (typeof playSfx === 'function') playSfx('fanfare');
+    if (typeof showCustomAlert === 'function') showCustomAlert('記帳 CSV 表格已成功匯出！可在 Excel/Google 表格開啟！', '📊');
+}
+
+function copyBudgetSummaryText() {
+    if (!budgetState.expenses || budgetState.expenses.length === 0) {
+        if (typeof showCustomAlert === 'function') showCustomAlert('尚無記帳資料可複製！', '⚠️');
+        return;
+    }
+
+    let sumJpy = 0;
+    let sumTwd = 0;
+    let cashTwd = 0;
+    let cardTwd = 0;
+
+    budgetState.expenses.forEach(item => {
+        const twd = calculateItemTwd(item.amountJpy, item.paymentMethod);
+        sumJpy += item.amountJpy;
+        sumTwd += twd;
+        if (item.paymentMethod === 'card') cardTwd += twd;
+        else cashTwd += twd;
+    });
+
+    let text = `💰 TOKYO RPG QUEST 記帳總覽清單\n`;
+    text += `===============================\n`;
+    text += `📊 總支出：NT$ ${sumTwd.toLocaleString()} (¥ ${sumJpy.toLocaleString()} JPY)\n`;
+    text += `💵 現金：NT$ ${cashTwd.toLocaleString()} | 💳 刷卡：NT$ ${cardTwd.toLocaleString()}\n`;
+    text += `💱 參考匯率：1 JPY = ${budgetState.exchangeRate} TWD (手續費 ${budgetState.cardFeePercent}%)\n`;
+    text += `===============================\n\n`;
+    text += `【消費明細清單】\n`;
+
+    budgetState.expenses.forEach((item, idx) => {
+        const catInfo = BUDGET_CATEGORIES[item.category] || BUDGET_CATEGORIES.other;
+        const twdVal = calculateItemTwd(item.amountJpy, item.paymentMethod);
+        const dayStr = item.day ? `D${item.day}` : '通用';
+        let payIcon = '💵';
+        if (item.paymentMethod === 'card') payIcon = '💳';
+        else if (item.paymentMethod === 'ic') payIcon = '🐧';
+
+        text += `${idx + 1}. [${dayStr} ${catInfo.icon}] ${item.title} - ¥ ${item.amountJpy.toLocaleString()} (NT$ ${twdVal.toLocaleString()}) ${payIcon}\n`;
+    });
+
+    navigator.clipboard.writeText(text).then(() => {
+        if (typeof playSfx === 'function') playSfx('fanfare');
+        if (typeof showCustomAlert === 'function') showCustomAlert('記帳文字清單已複製！可直接貼在 LINE 群組分享！', '📋');
+    }).catch(err => {
+        console.warn("Clipboard copy failed:", err);
+    });
+}
