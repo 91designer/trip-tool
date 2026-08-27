@@ -2,7 +2,7 @@
 // 💾 DATA STORAGE & RESTORE HELPERS
 // -------------------------------------------------------------
 
-const CURRENT_DATA_VERSION = '2026-09-08-v17-dedup';
+const CURRENT_DATA_VERSION = '2026-09-08-v18-shopping-tab';
 
 function saveData() {
     try {
@@ -11,6 +11,7 @@ function saveData() {
         localStorage.setItem('tokyo_quest_wishlist', JSON.stringify(window.wishlist));
         localStorage.setItem('tokyo_quest_flight_hotel', JSON.stringify(window.flightHotelInfo));
         localStorage.setItem('tokyo_quest_trip_config', JSON.stringify(window.tripConfig));
+        localStorage.setItem('tokyo_quest_shopping_list', JSON.stringify(window.shoppingList));
         localStorage.setItem('tokyo_quest_sheet_id', googleSheetId);
         localStorage.setItem('tokyo_quest_apps_script_url', googleAppsScriptUrl);
         localStorage.setItem('tokyo_quest_drive_folder_url', googleDriveFolderUrl);
@@ -27,6 +28,7 @@ function loadSavedState() {
             window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
             window.flightHotelInfo = typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {};
             window.tripConfig = typeof getOfficialDefaultTripConfig === 'function' ? getOfficialDefaultTripConfig() : {};
+            window.shoppingList = typeof getOfficialDefaultShoppingList === 'function' ? getOfficialDefaultShoppingList() : [];
             saveData();
             return;
         }
@@ -36,6 +38,7 @@ function loadSavedState() {
         const savedWishlist = localStorage.getItem('tokyo_quest_wishlist');
         const savedFlightHotel = localStorage.getItem('tokyo_quest_flight_hotel');
         const savedTripConfig = localStorage.getItem('tokyo_quest_trip_config');
+        const savedShoppingList = localStorage.getItem('tokyo_quest_shopping_list');
         const savedSheetId = localStorage.getItem('tokyo_quest_sheet_id');
         const savedScriptUrl = localStorage.getItem('tokyo_quest_apps_script_url');
         const savedDriveUrl = localStorage.getItem('tokyo_quest_drive_folder_url');
@@ -104,6 +107,16 @@ function loadSavedState() {
             window.tripConfig = typeof getOfficialDefaultTripConfig === 'function' ? getOfficialDefaultTripConfig() : {};
         }
 
+        if (savedShoppingList) {
+            try {
+                window.shoppingList = JSON.parse(savedShoppingList);
+            } catch(e) {
+                window.shoppingList = typeof getOfficialDefaultShoppingList === 'function' ? getOfficialDefaultShoppingList() : [];
+            }
+        } else {
+            window.shoppingList = typeof getOfficialDefaultShoppingList === 'function' ? getOfficialDefaultShoppingList() : [];
+        }
+
         if (savedSheetId) googleSheetId = savedSheetId;
         if (savedScriptUrl) googleAppsScriptUrl = savedScriptUrl;
         if (savedDriveUrl) googleDriveFolderUrl = savedDriveUrl;
@@ -114,6 +127,7 @@ function loadSavedState() {
         window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
         window.flightHotelInfo = typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {};
         window.tripConfig = typeof getOfficialDefaultTripConfig === 'function' ? getOfficialDefaultTripConfig() : {};
+        window.shoppingList = typeof getOfficialDefaultShoppingList === 'function' ? getOfficialDefaultShoppingList() : [];
     }
 }
 
@@ -123,6 +137,7 @@ function restoreDefaultData() {
     window.wishlist = typeof getOfficialDefaultWishlist === 'function' ? getOfficialDefaultWishlist() : [];
     window.flightHotelInfo = typeof getOfficialDefaultFlightHotelInfo === 'function' ? getOfficialDefaultFlightHotelInfo() : {};
     window.tripConfig = typeof getOfficialDefaultTripConfig === 'function' ? getOfficialDefaultTripConfig() : {};
+    window.shoppingList = typeof getOfficialDefaultShoppingList === 'function' ? getOfficialDefaultShoppingList() : [];
     saveData();
     if (typeof filterCategory === 'function') filterCategory('all');
     if (typeof renderPlaces === 'function') renderPlaces();

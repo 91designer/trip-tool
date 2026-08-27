@@ -127,11 +127,25 @@ function getOfficialDefaultTripConfig() {
     return JSON.parse(JSON.stringify(DEFAULT_TRIP_CONFIG));
 }
 
+// 🛍️ 採購與代購支線任務預設資料 (SHOPPING & PROXY PURCHASES DATASET)
+const DEFAULT_SHOPPING_LIST = [
+    { id: 'shop-1', name: '🧥 Workman Girl 機能防水外套', requester: '自用', priceJpy: 2900, done: false },
+    { id: 'shop-2', name: '⚡ 寶可夢中心皮卡丘限定公仔', requester: '小明代購', priceJpy: 3500, done: false },
+    { id: 'shop-3', name: '🍵 一保堂頂級抹茶粉 (丸之內/神保町)', requester: '媽媽委託', priceJpy: 1800, done: false },
+    { id: 'shop-4', name: '🧪 LE LABO GINZA SIX 城市限定香水', requester: '自用', priceJpy: 22000, done: false },
+    { id: 'shop-5', name: '🚬 IQOS 限量煙膏/主機 (銀座二丁目)', requester: '朋友代購', priceJpy: 10980, done: false }
+];
+
+function getOfficialDefaultShoppingList() {
+    return JSON.parse(JSON.stringify(DEFAULT_SHOPPING_LIST));
+}
+
 window.placesDatabase = JSON.parse(JSON.stringify(OFFICIAL_DEFAULT_PLACES));
 window.itinerary = getOfficialDefaultItinerary();
 window.wishlist = getOfficialDefaultWishlist();
 window.flightHotelInfo = getOfficialDefaultFlightHotelInfo();
 window.tripConfig = getOfficialDefaultTripConfig();
+window.shoppingList = getOfficialDefaultShoppingList();
 
 let currentCategory = 'all';
 let currentDay = 1;

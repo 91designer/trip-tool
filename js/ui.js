@@ -521,6 +521,155 @@ function renderWishlist() {
     }).join('');
 }
 
+// -------------------------------------------------------------
+// 🛍️ SHOPPING & PROXY PURCHASE SIDE QUEST TAB MODULE
+// -------------------------------------------------------------
+
+let sideQuestActiveTab = 'tickets';
+
+function switchSideQuestTab(tabName) {
+    sideQuestActiveTab = tabName;
+    const tabTickets = document.getElementById('tabSideQuestTickets');
+    const tabShopping = document.getElementById('tabSideQuestShopping');
+    const formTickets = document.getElementById('formSideQuestTickets');
+    const formShopping = document.getElementById('formSideQuestShopping');
+
+    if (tabName === 'tickets') {
+        if (tabTickets) tabTickets.className = 'pixel-btn pixel-btn-green text-xs font-bold py-1 px-3 active-tab';
+        if (tabShopping) tabShopping.className = 'pixel-btn text-xs font-bold py-1 px-3 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200';
+        if (formTickets) formTickets.classList.remove('hidden');
+        if (formShopping) formShopping.classList.add('hidden');
+        renderWishlist();
+    } else {
+        if (tabTickets) tabTickets.className = 'pixel-btn text-xs font-bold py-1 px-3 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200';
+        if (tabShopping) tabShopping.className = 'pixel-btn pixel-btn-gold text-xs font-bold py-1 px-3 active-tab';
+        if (formTickets) formTickets.classList.add('hidden');
+        if (formShopping) formShopping.classList.remove('hidden');
+        renderShoppingList();
+    }
+    if (typeof playSfx === 'function') playSfx('click');
+}
+
+function renderShoppingList() {
+    const container = document.getElementById('wishlistContainer');
+    if (!container) return;
+
+    if (!Array.isArray(window.shoppingList)) {
+        window.shoppingList = typeof getOfficialDefaultShoppingList === 'function' ? getOfficialDefaultShoppingList() : [];
+    }
+
+    const doneCount = window.shoppingList.filter(s => s.done).length;
+    const totalJpy = window.shoppingList.reduce((sum, s) => sum + (parseInt(s.priceJpy) || 0), 0);
+    const rate = (typeof budgetState !== 'undefined' && budgetState.exchangeRate) ? budgetState.exchangeRate : 0.215;
+    const totalTwd = Math.round(totalJpy * rate);
+
+    const completionEl = document.getElementById('wishlistCompletion');
+    if (completionEl) {
+        completionEl.textContent = `已購 ${doneCount}/${window.shoppingList.length} • 估價: ¥${totalJpy.toLocaleString()} (約 NT$${totalTwd.toLocaleString()})`;
+    }
+
+    if (window.shoppingList.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-slate-500 font-pixel-jp text-xs border border-dashed border-slate-800 rounded">🛍️ 尚無採購/代購項目，請在上方輸入商品名稱、委託人與金額！</div>`;
+        return;
+    }
+
+    container.innerHTML = window.shoppingList.map((item, idx) => {
+        const itemTwd = Math.round((parseInt(item.priceJpy) || 0) * rate);
+        const reqBadge = item.requester ? `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-sky-300 text-[10px] border border-slate-700/80 font-pixel-jp shrink-0">👤 ${item.requester}</span>` : '';
+        const priceBadge = item.priceJpy ? `<span class="text-amber-400 font-mono font-bold text-[11px] shrink-0">¥${parseInt(item.priceJpy).toLocaleString()} <span class="text-[9px] text-slate-400 font-normal">(NT$${itemTwd.toLocaleString()})</span></span>` : '';
+
+        return `
+            <div class="bg-slate-900 border border-slate-700/80 p-2 rounded flex items-center justify-between gap-2 text-xs hover:border-amber-500/60 transition group">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleShoppingItem(${idx})" class="rounded border-slate-700 text-amber-500 accent-amber-500 shrink-0 cursor-pointer">
+                    <div class="flex-1 min-w-0 flex items-center gap-1.5 flex-wrap ${item.done ? 'line-through text-slate-500' : 'text-slate-100'}">
+                        <span class="font-bold truncate">${item.name}</span>
+                        ${reqBadge}
+                        ${priceBadge}
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="pushShoppingToBudget(${idx})" class="pixel-btn text-[9px] py-0.5 px-1.5 text-amber-300 hover:text-amber-200" title="一鍵轉入記帳總覽">
+                        💰 轉記帳
+                    </button>
+                    <button onclick="deleteShoppingItem(${idx})" class="text-slate-500 hover:text-rose-400 p-1" title="刪除採購項目">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function addShoppingItem() {
+    const nameInput = document.getElementById('newShopNameInput');
+    const reqInput = document.getElementById('newShopReqInput');
+    const priceInput = document.getElementById('newShopPriceInput');
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    if (!name) return;
+
+    const requester = reqInput ? reqInput.value.trim() : '自用';
+    const priceJpy = priceInput ? (parseInt(priceInput.value) || 0) : 0;
+
+    if (!Array.isArray(window.shoppingList)) window.shoppingList = [];
+    window.shoppingList.push({
+        id: 'shop-' + Date.now(),
+        name: name,
+        requester: requester || '自用',
+        priceJpy: priceJpy,
+        done: false
+    });
+
+    saveData();
+    renderShoppingList();
+    if (nameInput) nameInput.value = '';
+    if (reqInput) reqInput.value = '';
+    if (priceInput) priceInput.value = '';
+    if (typeof playSfx === 'function') playSfx('equip');
+    if (typeof showCustomAlert === 'function') showCustomAlert(`已登錄採購項目「${name}」！`, '🛍️');
+}
+
+function toggleShoppingItem(idx) {
+    if (!window.shoppingList || !window.shoppingList[idx]) return;
+    window.shoppingList[idx].done = !window.shoppingList[idx].done;
+    saveData();
+    renderShoppingList();
+    if (typeof playSfx === 'function') playSfx('click');
+}
+
+function deleteShoppingItem(idx) {
+    if (!window.shoppingList || !window.shoppingList[idx]) return;
+    window.shoppingList.splice(idx, 1);
+    saveData();
+    renderShoppingList();
+    if (typeof playSfx === 'function') playSfx('click');
+}
+
+function pushShoppingToBudget(idx) {
+    if (!window.shoppingList || !window.shoppingList[idx]) return;
+    const item = window.shoppingList[idx];
+
+    if (typeof budgetState !== 'undefined' && Array.isArray(budgetState.expenses)) {
+        budgetState.expenses.push({
+            id: 'exp-shop-' + Date.now(),
+            title: `🛍️ ${item.name} (${item.requester || '自用'})`,
+            amountJpy: item.priceJpy || 0,
+            category: 'shopping',
+            paymentMethod: 'card',
+            day: 0,
+            timestamp: Date.now()
+        });
+        if (typeof saveBudgetState === 'function') saveBudgetState();
+        if (typeof renderBudgetSummary === 'function') renderBudgetSummary();
+        if (typeof playSfx === 'function') playSfx('fanfare');
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert(`已將「${item.name}」自動帶入 💰 記帳與預算控制面板！`, '💳');
+        }
+    }
+}
+
 function addWishlistItem() {
     const input = document.getElementById('newWishinput');
     if (!input) return;
