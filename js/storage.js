@@ -2,7 +2,7 @@
 // 💾 DATA STORAGE & RESTORE HELPERS
 // -------------------------------------------------------------
 
-const CURRENT_DATA_VERSION = '2026-09-08-v18-shopping-tab';
+const CURRENT_DATA_VERSION = '2026-09-08-v24-clean-shopping-list';
 
 function saveData() {
     try {

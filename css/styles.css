@@ -2,8 +2,8 @@ html {
     scroll-behavior: smooth;
 }
 
-body {
-    font-family: 'Noto Sans TC', 'DotGothic16', sans-serif;
+body, input, button, select, textarea {
+    font-family: 'DotGothic16', 'Pixelify Sans', 'Press Start 2P', 'Noto Sans TC', sans-serif;
     background-color: #0f172a;
     color: #f8fafc;
     background-image: radial-gradient(#1e293b 1px, transparent 1px);

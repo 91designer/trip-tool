@@ -12,6 +12,16 @@ function scrollToSection(id) {
     }
 }
 
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // 🛡️ 名稱安全過濾器 (確保素材庫與行程 100% 使用自然中文/日文景點名稱，絕不顯示代碼)
 function getCleanPlaceName(place) {
     if (!place) return '未命名景點';
