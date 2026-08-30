@@ -509,7 +509,7 @@ function renderWishlist() {
                     <span class="text-slate-600 group-hover:text-amber-400 font-bold select-none cursor-grab text-xs" title="按住拖曳排序">⣿</span>
                     <label class="flex items-center gap-2 flex-1 cursor-pointer truncate ${item.done ? 'line-through text-slate-500' : 'text-slate-200'}">
                         <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleWishlistItem(${idx})" class="rounded border-slate-700 text-amber-500 accent-amber-500 shrink-0">
-                        <span class="truncate">${item.text}</span>
+                        <span class="truncate font-pixel-jp">${item.text}</span>
                     </label>
                 </div>
 
@@ -545,14 +545,14 @@ function switchSideQuestTab(tabName) {
     const formShopping = document.getElementById('formSideQuestShopping');
 
     if (tabName === 'tickets') {
-        if (tabTickets) tabTickets.className = 'pixel-btn pixel-btn-green text-xs font-bold py-1 px-3 active-tab';
-        if (tabShopping) tabShopping.className = 'pixel-btn text-xs font-bold py-1 px-3 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200';
+        if (tabTickets) tabTickets.className = 'pixel-btn pixel-btn-green text-xs font-bold py-1 px-3 active-tab flex items-center gap-1';
+        if (tabShopping) tabShopping.className = 'pixel-btn text-xs font-bold py-1 px-3 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200 flex items-center gap-1';
         if (formTickets) formTickets.classList.remove('hidden');
         if (formShopping) formShopping.classList.add('hidden');
         renderWishlist();
     } else {
-        if (tabTickets) tabTickets.className = 'pixel-btn text-xs font-bold py-1 px-3 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200';
-        if (tabShopping) tabShopping.className = 'pixel-btn pixel-btn-gold text-xs font-bold py-1 px-3 active-tab';
+        if (tabTickets) tabTickets.className = 'pixel-btn text-xs font-bold py-1 px-3 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200 flex items-center gap-1';
+        if (tabShopping) tabShopping.className = 'pixel-btn pixel-btn-gold text-xs font-bold py-1 px-3 active-tab flex items-center gap-1';
         if (formTickets) formTickets.classList.add('hidden');
         if (formShopping) formShopping.classList.remove('hidden');
         renderShoppingList();

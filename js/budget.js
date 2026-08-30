@@ -335,3 +335,111 @@ function copyBudgetSummaryText() {
         console.warn("Clipboard copy failed:", err);
     });
 }
+
+// 🔮 鍊金術士速算盤與金幣匯率水晶 (ALCHEMIST'S CALCULATOR MODULE)
+let rpgCalcExpression = '';
+let rpgCalcCurrentValue = '0';
+
+function rpgCalcPress(key) {
+    if (typeof playSfx === 'function') playSfx('click');
+
+    if (key === 'AC') {
+        rpgCalcExpression = '';
+        rpgCalcCurrentValue = '0';
+    } else if (key === 'DEL') {
+        if (rpgCalcCurrentValue.length > 1) {
+            rpgCalcCurrentValue = rpgCalcCurrentValue.slice(0, -1);
+        } else {
+            rpgCalcCurrentValue = '0';
+        }
+    } else if (key === '=') {
+        evaluateRpgCalcExpression();
+    } else if (['+', '-', '*', '/'].includes(key)) {
+        if (rpgCalcCurrentValue !== '0' || rpgCalcExpression !== '') {
+            rpgCalcExpression += (rpgCalcExpression ? ' ' : '') + rpgCalcCurrentValue + ' ' + key;
+            rpgCalcCurrentValue = '0';
+        }
+    } else {
+        // Digits or dot
+        if (key === '.' && rpgCalcCurrentValue.includes('.')) return;
+        if (rpgCalcCurrentValue === '0' && key !== '.') {
+            rpgCalcCurrentValue = key;
+        } else {
+            rpgCalcCurrentValue += key;
+        }
+    }
+
+    updateRpgCalcDisplay();
+}
+
+function evaluateRpgCalcExpression() {
+    try {
+        let fullExpr = (rpgCalcExpression ? rpgCalcExpression + ' ' : '') + rpgCalcCurrentValue;
+        if (/^[0-9\s\+\-\*\/\.]*$/.test(fullExpr)) {
+            let evalResult = Function('"use strict"; return (' + fullExpr + ')')();
+            if (!isNaN(evalResult) && isFinite(evalResult)) {
+                rpgCalcCurrentValue = String(Math.round(evalResult));
+                rpgCalcExpression = '';
+            }
+        }
+    } catch(e) {
+        console.warn("Calc eval error:", e);
+    }
+}
+
+function handleRpgCalcDirectInput(val) {
+    rpgCalcCurrentValue = val.replace(/[^0-9\.]/g, '') || '0';
+    updateRpgCalcDisplay();
+}
+
+function updateRpgCalcDisplay() {
+    const exprEl = document.getElementById('rpgCalcExprDisplay');
+    const jpyDisplayEl = document.getElementById('rpgCalcJpyDisplay');
+    const twdDisplayEl = document.getElementById('quickCalcResultTwd');
+    const rateDisplayEl = document.getElementById('quickCalcRateDisplay');
+
+    if (exprEl) exprEl.textContent = (rpgCalcExpression || '') + (rpgCalcCurrentValue ? (rpgCalcExpression ? ' ' : '') + rpgCalcCurrentValue : '0');
+    if (jpyDisplayEl && document.activeElement !== jpyDisplayEl) jpyDisplayEl.value = rpgCalcCurrentValue;
+
+    const jpyVal = parseFloat(rpgCalcCurrentValue) || 0;
+    const rate = (typeof budgetState !== 'undefined' && budgetState.exchangeRate) ? budgetState.exchangeRate : 0.215;
+    const fee = (typeof budgetState !== 'undefined' && budgetState.cardFeePercent) ? budgetState.cardFeePercent : 1.5;
+    const twdVal = Math.round(jpyVal * rate * (1 + fee / 100));
+
+    if (twdDisplayEl) twdDisplayEl.textContent = `NT$ ${twdVal.toLocaleString()}`;
+    if (rateDisplayEl) rateDisplayEl.textContent = rate.toString();
+}
+
+function addQuickCalcToExpenses() {
+    const jpy = parseFloat(rpgCalcCurrentValue) || 0;
+    if (jpy <= 0) {
+        if (typeof showCustomAlert === 'function') showCustomAlert('請先試算或輸入有效的日幣金額！', '⚠️');
+        return;
+    }
+
+    if (typeof budgetState !== 'undefined' && Array.isArray(budgetState.expenses)) {
+        const rate = budgetState.exchangeRate || 0.215;
+        const fee = budgetState.cardFeePercent || 1.5;
+        const twd = Math.round(jpy * rate * (1 + fee / 100));
+
+        budgetState.expenses.push({
+            id: 'exp-quick-' + Date.now(),
+            title: `🔮 鍊金速算物資 (¥ ${jpy.toLocaleString()})`,
+            amountJpy: jpy,
+            category: 'shopping',
+            paymentMethod: 'card',
+            day: (typeof currentSelectedDay !== 'undefined') ? currentSelectedDay : 0,
+            note: '由鍊金術士速算盤一鍵寫入',
+            timestamp: Date.now()
+        });
+
+        saveBudgetState();
+        renderBudgetSummary();
+        rpgCalcExpression = '';
+        rpgCalcCurrentValue = '0';
+        updateRpgCalcDisplay();
+
+        if (typeof playSfx === 'function') playSfx('coin');
+        if (typeof showCustomAlert === 'function') showCustomAlert(`已將 ¥${jpy.toLocaleString()} (約 NT$${twd.toLocaleString()}) 寫入金幣庫！`, '💰');
+    }
+}

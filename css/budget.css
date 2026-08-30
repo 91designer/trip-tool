@@ -27,3 +27,8 @@
     color: #fef08a;
     border: 1px solid #eab308;
 }
+
+/* 🔮 鍊金術士速算盤特製效果 */
+#rpgCalcJpyDisplay:focus {
+    color: #f59e0b;
+}

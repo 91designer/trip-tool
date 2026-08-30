@@ -41,18 +41,17 @@ const DEFAULT_PLACES = [
     { id: "day4-kichijoji-hikiniku", category: "food", name: "🌳 穿越井之頭公園至吉祥寺商圈散策（午餐：挽肉與米）", sub: "午餐 • 武藏野市吉祥寺", desc: "綠意公園散步，逛吉祥寺特色選品店，享用現烤「挽肉與米」和牛漢堡排。", img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=400&q=80", mapQuery: "井之頭恩賜公園", lat: 35.6997, lng: 139.5762 },
     { id: "day4-omotesando-shopping", category: "shopping", name: "👟 原宿與表參道採買（On / HOKA 跑鞋旗艦店、LE LABO 香水、AMAM DACOTAN 麵包）", sub: "下午 • 澀谷區神宮前", desc: "On / HOKA 跑鞋旗艦店、LE LABO 質感香水、AMAM DACOTAN 爆款排隊生麵包。", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80", mapQuery: "表參道", lat: 35.6672, lng: 139.7063 },
 
-    // DAY 5 (09/08 二) - 最新建築園 & 日本橋銀座質感採買 (IQOS / LE LABO / 丸久小山園)
-    { id: "day5-edo-museum", category: "view", name: "🏛️ 江戶東京建築園參觀（小金井公園）", sub: "10:00–12:30 • 小金井市關野町 1-7-5", desc: "漫步復古昭和與江戶開港懷舊建築群，體驗千與千尋場景靈感地（搭 JR 中央線直達東京/日本橋 30 分鐘）。", img: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=400&q=80", mapQuery: "江戶東京建築園", lat: 35.7163, lng: 139.5126 },
-    { id: "day5-ginza-nihonbashi", category: "shopping", name: "🍵 日本橋 & 銀座質感採買與巡禮（bakery bank / 丸久小山園 / LE LABO / IQOS）", sub: "13:10–16:15 • 日本橋 & 銀座二丁目", desc: "bakery bank / Pâtisserie ease 頂級甜點、丸久小山園（銀座三越 B2F 抹茶粉）、LE LABO GINZA SIX 店、IQOS 銀座店（銀座二丁目）。", img: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80", mapQuery: "GINZA SIX", lat: 35.6715, lng: 139.7650 },
-    { id: "day5-art-aquarium", category: "view", name: "🎨 銀座金魚美術館 ART AQUARIUM GINZA", sub: "16:30–18:00 • 銀座三越 8F", desc: "夢幻金魚燈光藝術展，結合日式傳統美學與現代沉浸燈光秀（銀座三越 8F）。", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=400&q=80", mapQuery: "ART AQUARIUM GINZA", lat: 35.6715, lng: 139.7650 },
-    { id: "day5-dinner-ginza", category: "food", name: "🥩 晚餐：銀座知名料理晚宴（Tonkatsu Aoki 炸豬排 / 五代目花山烏龍麵）", sub: "18:30~ 晚餐 • 銀座 / 日本橋", desc: "品嚐 Tonkatsu Aoki 酥脆厚切炸豬排、五代目花山極致寬麵烏龍麵或百年壽喜燒人形町今半。", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80", mapQuery: "花山烏龍麵 銀座", lat: 35.6702, lng: 139.7675 },
+    // DAY 5 (09/08 二) - 淺草浴衣 & 貓頭鷹咖啡 & 洗錢神社 & 晴空塔
+    { id: "day5-kimono-asakusa", category: "shrine", name: "👘 淺草月見和服/浴衣換裝與淺草神社合照（預約 09:00）", sub: "預約 09:00 • 淺草神社合照", desc: "換上精緻日式浴衣/和服，前往淺草神社與被官稻荷神社參拜拍照。", img: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=400&q=80", mapQuery: "淺草神社", lat: 35.7153, lng: 139.7968 },
+    { id: "day5-owl-cafe", category: "park", name: "🦉 秋葉原貓頭鷹咖啡館（Akiba Fukurou）", sub: "上午 • 千代田區神田練塀町", desc: "療癒系互動體驗，近距離接觸與餵食可愛貓頭鷹。", img: "https://images.unsplash.com/photo-1543549790-8b5f4a028cfb?auto=format&fit=crop&w=400&q=80", mapQuery: "Akiba Fukurou", lat: 35.6997, lng: 139.7745 },
+    { id: "day5-koami-shrine", category: "shrine", name: "💰 日本橋小網神社強運洗錢", sub: "中午 • 中央區日本橋小網町 16-23", desc: "東京超強運洗錢神社！參拜洗錢井（銭洗いの井）求財運與厄除。", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=400&q=80", mapQuery: "小網神社", lat: 35.6853, lng: 139.7801 },
+    { id: "day5-skytree-pokemon", category: "shopping", name: "🗼 晴空塔商圈（寶可夢中心、祇園辻利抹茶粉）", sub: "下午 • 東京晴空塔 Solamachi", desc: "寶可夢中心晴空塔店、採買祇園辻利頂級抹茶粉與伴手禮。", img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=400&q=80", mapQuery: "東京晴空塔", lat: 35.7101, lng: 139.8107 },
 
-    // DAY 6 (09/09 三)
-    { id: "day6-kimono-asakusa", category: "shrine", name: "👘 淺草月見和服/浴衣換裝與淺草神社合照（預約 09:00）", sub: "預約 09:00 • 淺草神社合照", desc: "換上精緻日式浴衣/和服，前往淺草神社與被官稻荷神社參拜拍照。", img: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=400&q=80", mapQuery: "淺草神社", lat: 35.7153, lng: 139.7968 },
-    { id: "day6-owl-cafe", category: "park", name: "🦉 秋葉原貓頭鷹咖啡館（Akiba Fukurou）", sub: "上午 • 千代田區神田練塀町", desc: "療癒系互動體驗，近距離接觸與餵食可愛貓頭鷹。", img: "https://images.unsplash.com/photo-1543549790-8b5f4a028cfb?auto=format&fit=crop&w=400&q=80", mapQuery: "Akiba Fukurou", lat: 35.6997, lng: 139.7745 },
-    { id: "day6-koami-shrine", category: "shrine", name: "💰 日本橋小網神社強運洗錢", sub: "中午 • 中央區日本橋小網町 16-23", desc: "東京超強運洗錢神社！參拜洗錢井（銭洗いの井）求財運與厄除。", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=400&q=80", mapQuery: "小網神社", lat: 35.6853, lng: 139.7801 },
-    { id: "day6-skytree-pokemon", category: "shopping", name: "🗼 晴空塔商圈（寶可夢中心、祇園辻利抹茶粉）", sub: "下午 • 東京晴空塔 Solamachi", desc: "寶可夢中心晴空塔店、採買祇園辻利頂級抹茶粉與伴手禮。", img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=400&q=80", mapQuery: "東京晴空塔", lat: 35.7101, lng: 139.8107 },
-    { id: "day6-airport-return", category: "view", name: "✈️ 歸還浴衣，押上站搭京成 Access 直達成田機場，22:15 MM627 班機返台", sub: "22:15 MM627 • 成田 T1 ➔ 桃園 TPE", desc: "歸還浴衣，於押上站搭乘京成 Access 直達成田 T1，搭乘 22:15 樂桃 MM627 航班返台 (01:00 抵達 TPE)。", img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=400&q=80", mapQuery: "押上站", lat: 35.7107, lng: 139.8130 }
+    // DAY 6 (09/09 三) - 江戶東京建築園 & 銀座採買 & 金魚美術館 ➔ 成田返台
+    { id: "day6-edo-museum", category: "view", name: "🏛️ 江戶東京建築園參觀（小金井公園）", sub: "10:00–12:30 • 小金井市關野町 1-7-5", desc: "漫步復古昭和與江戶開港懷舊建築群，體驗千與千尋場景靈感地（搭 JR 中央線直達東京/日本橋 30 分鐘）。", img: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=400&q=80", mapQuery: "江戶東京建築園", lat: 35.7163, lng: 139.5126 },
+    { id: "day6-ginza-nihonbashi", category: "shopping", name: "🍵 日本橋 & 銀座質感採買與巡禮（bakery bank / 丸久小山園 / LE LABO / IQOS）", sub: "13:10–16:15 • 日本橋 & 銀座二丁目", desc: "bakery bank / Pâtisserie ease 頂級甜點、丸久小山園（銀座三越 B2F 抹茶粉）、LE LABO GINZA SIX 店、IQOS 銀座店（銀座二丁目）。", img: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80", mapQuery: "GINZA SIX", lat: 35.6715, lng: 139.7650 },
+    { id: "day6-art-aquarium", category: "view", name: "🎨 銀座金魚美術館 ART AQUARIUM GINZA", sub: "16:30–18:00 • 銀座三越 8F", desc: "夢幻金魚燈光藝術展，結合日式傳統美學與現代沉浸燈光秀（銀座三越 8F）。", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=400&q=80", mapQuery: "ART AQUARIUM GINZA", lat: 35.6715, lng: 139.7650 },
+    { id: "day6-airport-return", category: "view", name: "✈️ 結束銀座巡禮，搭車直達成田機場，22:15 MM627 班機返台", sub: "22:15 MM627 • 成田 T1 ➔ 桃園 TPE T1", desc: "結束銀座採買與展覽，於東京/日本橋/押上搭乘京成 Access 直達成田 T1，搭乘 22:15 樂桃 MM627 航班返台 (01:00 抵達 TPE)。", img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=400&q=80", mapQuery: "成田機場第1航廈", lat: 35.7720, lng: 140.3929 }
 ];
 
 const DAY_TITLES = {
@@ -60,8 +59,8 @@ const DAY_TITLES = {
     2: "🗓️ 09/05 (六) Day 2：潮見龍宮社 ➔ 台場 VR ➔ 品川水族館夜間秀",
     3: "🗓️ 09/06 (日) Day 3：弓道體驗 ➔ 鏈鋸人朝聖 ➔ 哈利波特影城 ➔ 池袋太陽城爆買",
     4: "🗓️ 09/07 (一) Day 4：吉卜力美術館 ➔ 吉祥寺 ➔ 表參道與原宿",
-    5: "🗓️ 09/08 (二) Day 5：江戶東京建築園 ➔ 日本橋/銀座採買 ➔ 金魚美術館 ➔ 銀座晚宴",
-    6: "🗓️ 09/09 (三) Day 6：淺草浴衣 ➔ 貓頭鷹咖啡 ➔ 洗錢神社 ➔ 晴空塔 ➔ 返台"
+    5: "🗓️ 09/08 (二) Day 5：淺草浴衣 ➔ 貓頭鷹咖啡 ➔ 洗錢神社 ➔ 晴空塔",
+    6: "🗓️ 09/09 (三) Day 6：江戶東京建築園 ➔ 銀座採買 ➔ 金魚美術館 ➔ 成田機場返台"
 };
 
 // 🗡️ 支線任務預設清單 (依 D1~D6 時間順序精確排列)
@@ -74,10 +73,10 @@ const DEFAULT_WISHLIST = [
     { text: "🎟️ [D3 門票預約] 東京華納兄弟哈利波特影城 (預約 13:00–13:30)", done: false },
     { text: "🎟️ [D4 門票預約] 三鷹之森吉卜力美術館 (預約 11:00 入場)", done: false },
     { text: "🎟️ [D4 整理券/預約] 吉祥寺 挽肉與米 現烤和牛漢堡排", done: false },
-    { text: "🎟️ [D5 門票預訂] 銀座金魚美術館 ART AQUARIUM 門票 (16:30–18:00)", done: false },
-    { text: "🎟️ [D5 質感採買] IQOS 銀座店 / LE LABO GINZA SIX / 丸久小山園", done: false },
-    { text: "🎟️ [D6 體驗預約] 淺草月見和服/浴衣換裝 (預約 09:00)", done: false },
-    { text: "🎟️ [D6 門票預約] 秋葉原貓頭鷹咖啡館 (Akiba Fukurou)", done: false }
+    { text: "🎟️ [D5 體驗預約] 淺草月見和服/浴衣換裝 (預約 09:00)", done: false },
+    { text: "🎟️ [D5 門票預約] 秋葉原貓頭鷹咖啡館 (Akiba Fukurou)", done: false },
+    { text: "🎟️ [D6 門票預訂] 銀座金魚美術館 ART AQUARIUM 門票 (16:30–18:00)", done: false },
+    { text: "🎟️ [D6 質感採買] IQOS 銀座店 / LE LABO GINZA SIX / 丸久小山園", done: false }
 ];
 
 function getDefaultItinerary() {
@@ -87,7 +86,7 @@ function getDefaultItinerary() {
         3: [DEFAULT_PLACES[9], DEFAULT_PLACES[10], DEFAULT_PLACES[11], DEFAULT_PLACES[12], DEFAULT_PLACES[13]],
         4: [DEFAULT_PLACES[14], DEFAULT_PLACES[15], DEFAULT_PLACES[16]],
         5: [DEFAULT_PLACES[17], DEFAULT_PLACES[18], DEFAULT_PLACES[19], DEFAULT_PLACES[20]],
-        6: [DEFAULT_PLACES[21], DEFAULT_PLACES[22], DEFAULT_PLACES[23], DEFAULT_PLACES[24], DEFAULT_PLACES[25]]
+        6: [DEFAULT_PLACES[21], DEFAULT_PLACES[22], DEFAULT_PLACES[23], DEFAULT_PLACES[24]]
     };
 }
 
@@ -130,6 +129,7 @@ function getOfficialDefaultTripConfig() {
 // 🛍️ 採購與代購支線任務預設資料 (SHOPPING & PROXY PURCHASES DATASET)
 const DEFAULT_SHOPPING_LIST = [
     { id: 'shop-0', name: '💊 ORIHIRO DHA+EPA 魚油軟膠囊 180粒', requester: 'BRYAN代購', priceJpy: 2200, done: false },
+    { id: 'shop-roger-1', name: '💊 DHC 強效瑪卡 20日分 60粒', requester: 'roger代購', priceJpy: 2200, done: false },
     { id: 'shop-ypl-1', name: '💊 大正百保能 GOLD A 綜合感冒藥微粒 (粉末) 44包', requester: '尤培霖代購', priceJpy: 1580, done: false },
     { id: 'shop-ypl-2', name: '🌀 TAKARA TOMY BEYBLADE X BX-00 鈷藍龍 2-60C 黑色限定版', requester: '尤培霖代購', priceJpy: 2420, done: false },
     { id: 'shop-ypl-3', name: '🌀 TAKARA TOMY BEYBLADE X BX-34 鈷藍龍 2-60C', requester: '尤培霖代購', priceJpy: 1980, done: false },
