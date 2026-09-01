@@ -2,7 +2,7 @@
 // 💾 DATA STORAGE & RESTORE HELPERS
 // -------------------------------------------------------------
 
-const CURRENT_DATA_VERSION = '2026-09-08-v33-roger-dhc-maca';
+const CURRENT_DATA_VERSION = '2026-09-08-v37-budget-and-roger-fish-oil-update';
 
 function saveData() {
     try {

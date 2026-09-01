@@ -26,7 +26,7 @@ const DEFAULT_PLACES = [
     // DAY 2 (09/05 六)
     { id: "day2-shiomi-shrine", category: "shrine", name: "⛩️ 潮見龍宮社參拜", sub: "上午 • 江東區潮見 1-28-6", desc: "隱身於東京灣區的特色神社，供奉龍宮大神，氣氛幽靜獨特。", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=400&q=80", mapQuery: "東京潮見龍宮社", lat: 35.6582, lng: 139.8173 },
     { id: "day2-odaiba-statue", category: "view", name: "🏙️ 台場海濱公園與自由女神像散步", sub: "中午 • 港區台場", desc: "打卡自由女神像與彩虹大橋，享受東京灣畔海風與絕景。", img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=400&q=80", mapQuery: "台場自由女神像", lat: 35.6277, lng: 139.7788 },
-    { id: "day2-tyffonium-vr", category: "park", name: "🔮 台場 Tyffonium VR 沉浸體驗（預約 13:30–14:00）", sub: "預約 13:30–14:00 • DiverCity Tokyo", desc: "體驗次世代魔幻沉浸式 VR 探索，身歷其境的感官冒險旅程。", img: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=400&q=80", mapQuery: "Tyffonium Odaiba", lat: 35.6253, lng: 139.7755 },
+    { id: "day2-tyffonium-vr", category: "park", name: "🔮 台場 Tyffonium VR 沉浸體驗（預約 13:30）", sub: "預約 13:30 • DiverCity Tokyo", desc: "預約 13:30 體驗次世代魔幻沉浸式 VR 探索，身歷其境的感官冒險旅程。", img: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=400&q=80", mapQuery: "Tyffonium Odaiba", lat: 35.6253, lng: 139.7755 },
     { id: "day2-aqua-park", category: "park", name: "🐬 品川水族館（Maxell Aqua Park）觀賞 19:00 夜間海豚秀與 19:45 水幕秀", sub: "19:00 海豚秀 • 19:45 水幕秀 • 港區高輪", desc: "結合絢麗光影音效與海洋生物，觀賞絕美夜間海豚秀與奇幻水幕燈光秀。", img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=400&q=80", mapQuery: "Maxell Aqua Park Shinagawa", lat: 35.6285, lng: 139.7386 },
 
     // DAY 3 (09/06 日) - 最新《鏈鋸人》朝聖 & 弓道 & 哈利波特時間軸
@@ -66,7 +66,7 @@ const DAY_TITLES = {
 // 🗡️ 支線任務預設清單 (依 D1~D6 時間順序精確排列)
 const DEFAULT_WISHLIST = [
     { text: "🎟️ [D1 泡湯預訂] 千客萬來 豐洲萬葉俱樂部 泡湯體驗券", done: false },
-    { text: "🎟️ [D2 體驗預約] 台場 Tyffonium VR 沉浸體驗 (預約 13:30–14:00)", done: false },
+    { text: "🎟️ [D2 體驗預約] 台場 Tyffonium VR 沉浸體驗 (預約 13:30)", done: false },
     { text: "🎟️ [D2 門票預訂] 品川水族館 Maxell Aqua Park 夜間秀門票", done: false },
     { text: "🎟️ [D3 體驗預約] 日式弓道體驗 (08:30 京王新線幡谷站檢票口前集合)", done: false },
     { text: "🎟️ [D3 聖地巡禮] 《鏈鋸人》神保町朝聖 (喫茶エル / 街景打卡)", done: false },
@@ -130,6 +130,7 @@ function getOfficialDefaultTripConfig() {
 const DEFAULT_SHOPPING_LIST = [
     { id: 'shop-0', name: '💊 ORIHIRO DHA+EPA 魚油軟膠囊 180粒', requester: 'BRYAN代購', priceJpy: 2200, done: false },
     { id: 'shop-roger-1', name: '💊 DHC 強效瑪卡 20日分 60粒', requester: 'roger代購', priceJpy: 2200, done: false },
+    { id: 'shop-roger-2', name: '💊 DHC 魚油 60粒', requester: 'Roger代購', priceJpy: 1800, done: false },
     { id: 'shop-ypl-1', name: '💊 大正百保能 GOLD A 綜合感冒藥微粒 (粉末) 44包', requester: '尤培霖代購', priceJpy: 1580, done: false },
     { id: 'shop-ypl-2', name: '🌀 TAKARA TOMY BEYBLADE X BX-00 鈷藍龍 2-60C 黑色限定版', requester: '尤培霖代購', priceJpy: 2420, done: false },
     { id: 'shop-ypl-3', name: '🌀 TAKARA TOMY BEYBLADE X BX-34 鈷藍龍 2-60C', requester: '尤培霖代購', priceJpy: 1980, done: false },

@@ -366,6 +366,123 @@ function closeAddPlaceModal() {
     if (modal) modal.classList.add('hidden');
 }
 
+// ✨ 智慧網址解析與一鍵自動帶入函數 (GOOGLE MAPS & INSTAGRAM)
+function parseSmartLink(inputStr) {
+    if (!inputStr) return;
+    const str = inputStr.trim();
+    if (!str) return;
+
+    const noticeEl = document.getElementById('smartParseNotice');
+    const noticeTextEl = document.getElementById('smartParseNoticeText');
+
+    let extractedName = '';
+    let extractedQuery = '';
+    let extractedLat = '';
+    let extractedLng = '';
+    let extractedDesc = '';
+    let extractedCategory = '';
+
+    // 1. Google Maps 網址解析
+    if (str.includes('google.com/maps') || str.includes('maps.app.goo.gl') || str.includes('goo.gl/maps')) {
+        const coordMatch = str.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (coordMatch) {
+            extractedLat = coordMatch[1];
+            extractedLng = coordMatch[2];
+        }
+
+        const placeMatch = str.match(/\/place\/([^/@\?]+)/);
+        if (placeMatch) {
+            try {
+                extractedName = decodeURIComponent(placeMatch[1].replace(/\+/g, ' '));
+            } catch(e) {
+                extractedName = placeMatch[1].replace(/\+/g, ' ');
+            }
+        } else {
+            const qMatch = str.match(/[\?&](?:query|q)=([^&]+)/);
+            if (qMatch) {
+                try {
+                    extractedName = decodeURIComponent(qMatch[1].replace(/\+/g, ' '));
+                } catch(e) {
+                    extractedName = qMatch[1].replace(/\+/g, ' ');
+                }
+            }
+        }
+
+        const textBeforeLink = str.split(/https?:\/\//)[0].trim();
+        if (textBeforeLink && textBeforeLink.length > 1) {
+            extractedName = textBeforeLink;
+        }
+
+        if (!extractedName) {
+            extractedName = "Google Maps 新景點";
+        }
+        extractedQuery = extractedName;
+        extractedDesc = `📍 連結與座標導航：${str}`;
+
+        const lower = extractedName.toLowerCase();
+        if (lower.includes('寺') || lower.includes('神社') || lower.includes('宮') || lower.includes('shrine')) {
+            extractedCategory = 'shrine';
+        } else if (lower.includes('抹茶') || lower.includes('茶') || lower.includes('matcha')) {
+            extractedCategory = 'matcha';
+        } else if (lower.includes('肉') || lower.includes('飯') || lower.includes('拉麵') || lower.includes('和牛') || lower.includes('咖哩') || lower.includes('鴨') || lower.includes('restaurant') || lower.includes('café') || lower.includes('cafe')) {
+            extractedCategory = 'food';
+        } else if (lower.includes('館') || lower.includes('影城') || lower.includes('園') || lower.includes('vr') || lower.includes('水族館')) {
+            extractedCategory = 'park';
+        } else if (lower.includes('店') || lower.includes('商圈') || lower.includes('six') || lower.includes('city') || lower.includes('outlet')) {
+            extractedCategory = 'shopping';
+        } else {
+            extractedCategory = 'view';
+        }
+    } 
+    // 2. Instagram 貼文 / Reels 影片網址解析
+    else if (str.includes('instagram.com')) {
+        const textBeforeLink = str.split(/https?:\/\//)[0].trim();
+        const isReel = str.includes('/reel/') || str.includes('/reels/');
+        const mediaTypeStr = isReel ? '🎬 IG Reels 短影音' : '📸 IG 景點貼文';
+
+        if (textBeforeLink && textBeforeLink.length > 1) {
+            extractedName = textBeforeLink;
+        } else {
+            extractedName = isReel ? 'Instagram 話題景點短影音' : 'Instagram 熱門打卡點';
+        }
+
+        extractedQuery = extractedName.replace(/^📱|🎬|📸/g, '').trim();
+        extractedDesc = `📱 ${mediaTypeStr}：${str}\n由 IG 社群推薦景點，點擊網址即可播放與查閱詳細介紹！`;
+        extractedCategory = isReel ? 'food' : 'view';
+    } else {
+        extractedName = str.split(/https?:\/\//)[0].trim() || str;
+        extractedQuery = extractedName;
+        extractedDesc = `🔗 參考連結：${str}`;
+        extractedCategory = 'view';
+    }
+
+    const nameEl = document.getElementById('newName');
+    const descEl = document.getElementById('newDesc');
+    const mapQueryEl = document.getElementById('newMapQuery');
+    const latEl = document.getElementById('newLat');
+    const lngEl = document.getElementById('newLng');
+    const catEl = document.getElementById('newCategory');
+
+    if (nameEl && extractedName) nameEl.value = extractedName;
+    if (descEl && extractedDesc) descEl.value = extractedDesc;
+    if (mapQueryEl && extractedQuery) mapQueryEl.value = extractedQuery;
+    if (latEl && extractedLat) latEl.value = extractedLat;
+    if (lngEl && extractedLng) lngEl.value = extractedLng;
+    if (catEl && extractedCategory) catEl.value = extractedCategory;
+
+    if (noticeEl && noticeTextEl) {
+        noticeTextEl.textContent = `已成功智慧帶入「${extractedName}」與對應地圖細節！`;
+        noticeEl.classList.remove('hidden');
+    }
+
+    if (typeof playSfx === 'function') playSfx('complete');
+}
+
+function parseSmartLinkBtn() {
+    const input = document.getElementById('smartLinkInput');
+    if (input) parseSmartLink(input.value);
+}
+
 async function saveNewPlace() {
     const nameInput = document.getElementById('newName');
     const catInput = document.getElementById('newCategory');
@@ -423,13 +540,14 @@ async function saveNewPlace() {
     if (lngInput) lngInput.value = '';
     if (imgInput) imgInput.value = '';
 
+    const smartLinkInput = document.getElementById('smartLinkInput');
+    const noticeEl = document.getElementById('smartParseNotice');
+    if (smartLinkInput) smartLinkInput.value = '';
+    if (noticeEl) noticeEl.classList.add('hidden');
+
     if (typeof playSfx === 'function') playSfx('equip');
     if (typeof showCustomAlert === 'function') {
-        showCustomAlert(`已成功登錄新景點「${name}」！`, '✨');
-    }
-
-    if (typeof googleAppsScriptUrl !== 'undefined' && googleAppsScriptUrl && typeof postNewPlaceToGoogleSheet === 'function') {
-        postNewPlaceToGoogleSheet({ ...newPlace, day: selectedDay });
+        showCustomAlert(`已成功將「${name}」新增至素材庫與行程！\n點擊「🌐 雲端素材庫 ➔ 開啟雲端試算表」亦可直接在線上 Google Sheet 編輯或分享給成員！`, '✨');
     }
 }
 
@@ -575,6 +693,7 @@ function renderShoppingList() {
 
     const completionEl = document.getElementById('wishlistCompletion');
     if (completionEl) {
+        completionEl.className = 'text-xs font-pixel-jp text-amber-300 font-bold';
         completionEl.textContent = `已購 ${doneCount}/${window.shoppingList.length} • 估價: ¥${totalJpy.toLocaleString()} (約 NT$${totalTwd.toLocaleString()})`;
     }
 

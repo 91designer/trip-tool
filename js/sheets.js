@@ -543,22 +543,24 @@ function updateDriveFolderLinks() {
     const folderUrl = googleDriveFolderUrl || 'https://drive.google.com/drive/folders/1MZkiA956v0goxCa7Zu4HzP1EfZZ1yKeW?usp=drive_link';
     const headerBtn = document.getElementById('googleDriveFolderBtn');
     const modalBtn = document.getElementById('modalDriveFolderLink');
+    const codexBtn = document.getElementById('codexSheetBtn');
+    const directLink = document.getElementById('sheetDirectLink');
+    const sheetEditUrl = `https://docs.google.com/spreadsheets/d/${extractSheetId(googleSheetId)}/edit`;
+
     if (headerBtn) headerBtn.href = folderUrl;
     if (modalBtn) modalBtn.href = folderUrl;
+    if (codexBtn) codexBtn.href = sheetEditUrl;
+    if (directLink) directLink.href = sheetEditUrl;
 }
 
 // SHEET SETTINGS MODAL FUNCTIONS
 function openSheetSettingsModal() {
     const modal = document.getElementById('sheetSettingsModal');
     const input = document.getElementById('sheetUrlInput');
-    const scriptUrlInput = document.getElementById('scriptUrlInput');
     const driveUrlInput = document.getElementById('driveFolderUrlInput');
-    const link = document.getElementById('sheetDirectLink');
 
     if (input) input.value = googleSheetId;
-    if (scriptUrlInput) scriptUrlInput.value = googleAppsScriptUrl || '';
     if (driveUrlInput) driveUrlInput.value = googleDriveFolderUrl || 'https://drive.google.com/drive/folders/1MZkiA956v0goxCa7Zu4HzP1EfZZ1yKeW?usp=drive_link';
-    if (link) link.href = `https://docs.google.com/spreadsheets/d/${extractSheetId(googleSheetId)}/edit`;
 
     updateDriveFolderLinks();
     if (modal) modal.classList.remove('hidden');
@@ -570,11 +572,9 @@ function closeSheetSettingsModal() {
 
 function testAndSaveSheetUrl() {
     const val = document.getElementById('sheetUrlInput')?.value.trim();
-    const scriptVal = document.getElementById('scriptUrlInput')?.value.trim();
     const driveVal = document.getElementById('driveFolderUrlInput')?.value.trim();
     
     if (val) googleSheetId = extractSheetId(val);
-    if (scriptVal !== undefined) googleAppsScriptUrl = scriptVal;
     if (driveVal) googleDriveFolderUrl = driveVal;
     
     updateDriveFolderLinks();

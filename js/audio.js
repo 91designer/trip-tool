@@ -1,16 +1,23 @@
 // -------------------------------------------------------------
-// 🔊 WEB AUDIO & 8-BIT RETRO RPG BGM ENGINE
+// 🔊 WEB AUDIO & 8-BIT RETRO RPG BGM & SFX ENGINE (INDEPENDENT CHANNELS)
 // -------------------------------------------------------------
 
 let audioCtx = null;
 let masterGain = null;
 let bgmGain = null;
 let sfxGain = null;
+
 let bgmPlaying = false;
 let sfxEnabled = true;
 let masterVolume = 30; // 0 ~ 100
-let bgmTimer = null;
+
+// Lookahead Audio Scheduler variables for 100% stutter-free BGM
+let lookaheadTimer = null;
+let nextNoteTime = 0.0;
 let bgmStep = 0;
+const TEMPO_STEP_TIME = 0.165; // 165ms per 16th note (~90 BPM)
+const SCHEDULE_AHEAD_TIME = 0.25; // Queue notes 250ms in advance
+const LOOKAHEAD_MS = 30; // Check queue every 30ms
 
 // 🎮 復古 RPG 冒險主題曲 32-Step 音符陣列 (Hz)
 const BGM_MELODY = [
@@ -37,24 +44,28 @@ const BGM_BASS = [
 
 function initAudioContext() {
     if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        masterGain = audioCtx.createGain();
-        bgmGain = audioCtx.createGain();
-        sfxGain = audioCtx.createGain();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+            
+            masterGain = audioCtx.createGain();
+            bgmGain = audioCtx.createGain();
+            sfxGain = audioCtx.createGain();
 
-        bgmGain.connect(masterGain);
-        sfxGain.connect(masterGain);
-        masterGain.connect(audioCtx.destination);
+            // 獨立的 Gain 控制音軌，互不干涉
+            bgmGain.connect(masterGain);
+            sfxGain.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
 
-        try {
-            const savedVol = localStorage.getItem('tokyo_quest_volume');
-            if (savedVol !== null) {
-                masterVolume = parseInt(savedVol);
-            }
-        } catch(e){}
+            try {
+                const savedVol = localStorage.getItem('tokyo_quest_volume');
+                if (savedVol !== null) {
+                    masterVolume = parseInt(savedVol);
+                }
+            } catch(e){}
 
-        applyVolume();
+            applyVolume();
+        }
     }
     if (audioCtx && audioCtx.state === 'suspended') {
         audioCtx.resume();
@@ -102,66 +113,82 @@ function toggleBgm() {
     }
 }
 
+// 🎼 高精度獨立 Lookahead BGM 調度器 (確保按鈕音效觸發時 BGM 絕不卡頓或中斷)
+function scheduleBgmNote(step, time) {
+    if (!bgmPlaying || !audioCtx || !bgmGain) return;
+
+    const melodyFreq = BGM_MELODY[step % BGM_MELODY.length];
+    const bassFreq = BGM_BASS[step % BGM_BASS.length];
+
+    // 1. 主旋律 (Triangle 波，溫和復古 Chiptune 質感)
+    if (melodyFreq > 0) {
+        try {
+            const osc = audioCtx.createOscillator();
+            const noteGain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(melodyFreq, time);
+
+            noteGain.gain.setValueAtTime(0.12, time);
+            noteGain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+
+            osc.connect(noteGain);
+            noteGain.connect(bgmGain);
+            osc.start(time);
+            osc.stop(time + 0.15);
+        } catch(e){}
+    }
+
+    // 2. 伴奏貝斯 (Square 波，復古電玩震撼感)
+    if (bassFreq > 0) {
+        try {
+            const bassOsc = audioCtx.createOscillator();
+            const bassGainNode = audioCtx.createGain();
+            bassOsc.type = 'square';
+            bassOsc.frequency.setValueAtTime(bassFreq, time);
+
+            bassGainNode.gain.setValueAtTime(0.05, time);
+            bassGainNode.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
+
+            bassOsc.connect(bassGainNode);
+            bassGainNode.connect(bgmGain);
+            bassOsc.start(time);
+            bassOsc.stop(time + 0.14);
+        } catch(e){}
+    }
+}
+
+function nextBgmStep() {
+    nextNoteTime += TEMPO_STEP_TIME;
+    bgmStep++;
+}
+
+function bgmScheduler() {
+    if (!bgmPlaying || !audioCtx) return;
+
+    while (nextNoteTime < audioCtx.currentTime + SCHEDULE_AHEAD_TIME) {
+        scheduleBgmNote(bgmStep, nextNoteTime);
+        nextBgmStep();
+    }
+}
+
 function startBgmEngine() {
     stopBgmEngine();
+    initAudioContext();
+    if (!audioCtx) return;
+
     bgmStep = 0;
+    nextNoteTime = audioCtx.currentTime + 0.05;
+    
+    // 獨立播放啟動音效，不干擾音樂調度
     playSfx('fanfare');
 
-    // 啟動 8-bit RPG 復古音樂迴圈 (每 165ms 一拍)
-    bgmTimer = setInterval(() => {
-        if (!bgmPlaying || !audioCtx) {
-            stopBgmEngine();
-            return;
-        }
-
-        const now = audioCtx.currentTime;
-        const melodyFreq = BGM_MELODY[bgmStep % BGM_MELODY.length];
-        const bassFreq = BGM_BASS[bgmStep % BGM_BASS.length];
-
-        // 1. 主旋律 (Triangle 波，溫和復古 Chiptune 質感)
-        if (melodyFreq > 0) {
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(melodyFreq, now);
-
-                gain.gain.setValueAtTime(0.12, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-
-                osc.connect(gain);
-                gain.connect(bgmGain);
-                osc.start(now);
-                osc.stop(now + 0.15);
-            } catch(e){}
-        }
-
-        // 2. 伴奏貝斯 (Square 波，復古電玩震撼感)
-        if (bassFreq > 0) {
-            try {
-                const bassOsc = audioCtx.createOscillator();
-                const bassGain = audioCtx.createGain();
-                bassOsc.type = 'square';
-                bassOsc.frequency.setValueAtTime(bassFreq, now);
-
-                bassGain.gain.setValueAtTime(0.05, now);
-                bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-
-                bassOsc.connect(bassGain);
-                bassGain.connect(bgmGain);
-                bassOsc.start(now);
-                bassOsc.stop(now + 0.14);
-            } catch(e){}
-        }
-
-        bgmStep++;
-    }, 165);
+    lookaheadTimer = setInterval(bgmScheduler, LOOKAHEAD_MS);
 }
 
 function stopBgmEngine() {
-    if (bgmTimer) {
-        clearInterval(bgmTimer);
-        bgmTimer = null;
+    if (lookaheadTimer) {
+        clearInterval(lookaheadTimer);
+        lookaheadTimer = null;
     }
 }
 
@@ -171,6 +198,7 @@ function toggleSfx() {
     if (label) label.textContent = sfxEnabled ? "🔊 音效: 開" : "🔇 音效: 關";
 }
 
+// 🔊 獨立按鈕音效 Engine (使用獨立 sfxGain 管道，與 BGM 徹底分離)
 function playSfx(type) {
     if (!sfxEnabled) return;
     initAudioContext();
@@ -178,23 +206,25 @@ function playSfx(type) {
 
     const now = audioCtx.currentTime;
     const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(sfxGain || masterGain || audioCtx.destination);
+    const sfxNodeGain = audioCtx.createGain();
+    
+    osc.connect(sfxNodeGain);
+    sfxNodeGain.connect(sfxGain || masterGain || audioCtx.destination);
 
     if (type === 'click') {
         osc.type = 'square';
-        osc.frequency.setValueAtTime(600, now);
-        gain.gain.setValueAtTime(0.08, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.frequency.setValueAtTime(700, now);
+        osc.frequency.exponentialRampToValueAtTime(350, now + 0.04);
+        sfxNodeGain.gain.setValueAtTime(0.08, now);
+        sfxNodeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
         osc.start(now);
-        osc.stop(now + 0.05);
+        osc.stop(now + 0.04);
     } else if (type === 'equip') {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(440, now);
         osc.frequency.setValueAtTime(880, now + 0.08);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+        sfxNodeGain.gain.setValueAtTime(0.1, now);
+        sfxNodeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
         osc.start(now);
         osc.stop(now + 0.16);
     } else if (type === 'complete') {
@@ -202,27 +232,35 @@ function playSfx(type) {
         osc.frequency.setValueAtTime(523.25, now);
         osc.frequency.setValueAtTime(659.25, now + 0.08);
         osc.frequency.setValueAtTime(783.99, now + 0.16);
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        sfxNodeGain.gain.setValueAtTime(0.12, now);
+        sfxNodeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
         osc.start(now);
         osc.stop(now + 0.3);
     } else if (type === 'delete') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(300, now);
         osc.frequency.linearRampToValueAtTime(100, now + 0.1);
-        gain.gain.setValueAtTime(0.08, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        sfxNodeGain.gain.setValueAtTime(0.08, now);
+        sfxNodeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
         osc.start(now);
         osc.stop(now + 0.1);
+    } else if (type === 'coin') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(987.77, now); // B5
+        osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+        sfxNodeGain.gain.setValueAtTime(0.1, now);
+        sfxNodeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.start(now);
+        osc.stop(now + 0.22);
     } else if (type === 'fanfare') {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(523.25, now);
-        osc.frequency.setValueAtTime(659.25, now + 0.1);
-        osc.frequency.setValueAtTime(783.99, now + 0.2);
-        osc.frequency.setValueAtTime(1046.50, now + 0.3);
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc.frequency.setValueAtTime(659.25, now + 0.08);
+        osc.frequency.setValueAtTime(783.99, now + 0.16);
+        osc.frequency.setValueAtTime(1046.50, now + 0.24);
+        sfxNodeGain.gain.setValueAtTime(0.12, now);
+        sfxNodeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
         osc.start(now);
-        osc.stop(now + 0.5);
+        osc.stop(now + 0.4);
     }
 }

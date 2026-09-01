@@ -8,6 +8,19 @@ let budgetState = {
     expenses: []           // [{ id, title, amountJpy, category, paymentMethod, day, note, timestamp }]
 };
 
+const DEFAULT_BUDGET_EXPENSES = [
+    { id: 'exp-def-1', title: '🛡️ 旅平險+不便險 (NK&亮瑜)', amountJpy: 17320, category: 'other', paymentMethod: 'card', day: 0, note: '預付 NT$ 3,780', timestamp: 1 },
+    { id: 'exp-def-2', title: '✈️ 樂桃航空來回機票', amountJpy: 154760, category: 'transport', paymentMethod: 'card', day: 1, note: '預付 NT$ 33,777', timestamp: 2 },
+    { id: 'exp-def-3', title: '🏨 飯店住宿 (5晚合計)', amountJpy: 60540, category: 'stay', paymentMethod: 'card', day: 1, note: '預付 NT$ 13,213', timestamp: 3 },
+    { id: 'exp-def-4', title: '🪄 哈利波特影城門票 + 地鐵周遊券', amountJpy: 25244, category: 'ticket', paymentMethod: 'card', day: 3, note: '預付 NT$ 5,509', timestamp: 4 },
+    { id: 'exp-def-5', title: '🏹 日式弓道體驗 (全體預約)', amountJpy: 52260, category: 'ticket', paymentMethod: 'card', day: 3, note: '預付 NT$ 11,405', timestamp: 5 },
+    { id: 'exp-def-6', title: '🔮 台場 Tyffonium VR 沉浸體驗 (4位)', amountJpy: 8800, category: 'ticket', paymentMethod: 'card', day: 2, note: '¥ 2,200 / 每人 (共 4 位)', timestamp: 6 },
+    { id: 'exp-def-7', title: '👘 淺草月見蕾絲浴衣換裝', amountJpy: 7000, category: 'shopping', paymentMethod: 'card', day: 5, note: '¥ 7,000', timestamp: 7 },
+    { id: 'exp-def-8', title: '💄 浴衣日式整體妝容設計', amountJpy: 6000, category: 'shopping', paymentMethod: 'card', day: 5, note: '¥ 6,000', timestamp: 8 },
+    { id: 'exp-def-9', title: '👘 男士日式和服/浴衣租借', amountJpy: 4000, category: 'shopping', paymentMethod: 'card', day: 5, note: '¥ 4,000', timestamp: 9 },
+    { id: 'exp-def-10', title: '📸 淺草神社外景隨行攝影 (30分鐘)', amountJpy: 12000, category: 'ticket', paymentMethod: 'card', day: 5, note: '¥ 12,000', timestamp: 10 }
+];
+
 const BUDGET_CATEGORIES = {
     food: { label: '🥩 美食佳餚', icon: '🥩' },
     shopping: { label: '🛍️ 購物採買', icon: '🛍️' },
@@ -29,10 +42,17 @@ function loadBudgetState() {
             const parsed = JSON.parse(saved);
             if (parsed.exchangeRate) budgetState.exchangeRate = parseFloat(parsed.exchangeRate);
             if (parsed.cardFeePercent !== undefined) budgetState.cardFeePercent = parseFloat(parsed.cardFeePercent);
-            if (Array.isArray(parsed.expenses)) budgetState.expenses = parsed.expenses;
+            if (Array.isArray(parsed.expenses) && parsed.expenses.length > 0) {
+                budgetState.expenses = parsed.expenses;
+            } else {
+                budgetState.expenses = JSON.parse(JSON.stringify(DEFAULT_BUDGET_EXPENSES));
+            }
+        } else {
+            budgetState.expenses = JSON.parse(JSON.stringify(DEFAULT_BUDGET_EXPENSES));
         }
     } catch (e) {
         console.warn("Failed to load budget state:", e);
+        budgetState.expenses = JSON.parse(JSON.stringify(DEFAULT_BUDGET_EXPENSES));
     }
 }
 
