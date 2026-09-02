@@ -2,7 +2,7 @@
 // 💾 DATA STORAGE & RESTORE HELPERS
 // -------------------------------------------------------------
 
-const CURRENT_DATA_VERSION = '2026-09-08-v37-budget-and-roger-fish-oil-update';
+const CURRENT_DATA_VERSION = '2026-09-08-v38-add-miau-kiddy-land-opanchu-usagi';
 
 function saveData() {
     try {

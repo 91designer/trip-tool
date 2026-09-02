@@ -131,6 +131,7 @@ const DEFAULT_SHOPPING_LIST = [
     { id: 'shop-0', name: '💊 ORIHIRO DHA+EPA 魚油軟膠囊 180粒', requester: 'BRYAN代購', priceJpy: 2200, done: false },
     { id: 'shop-roger-1', name: '💊 DHC 強效瑪卡 20日分 60粒', requester: 'roger代購', priceJpy: 2200, done: false },
     { id: 'shop-roger-2', name: '💊 DHC 魚油 60粒', requester: 'Roger代購', priceJpy: 1800, done: false },
+    { id: 'shop-miau-1', name: '🐰 KIDDY LAND 褲褲兔 (おぱんちゅうさぎ) 周邊', requester: '喵喵代購', priceJpy: 2200, done: false },
     { id: 'shop-ypl-1', name: '💊 大正百保能 GOLD A 綜合感冒藥微粒 (粉末) 44包', requester: '尤培霖代購', priceJpy: 1580, done: false },
     { id: 'shop-ypl-2', name: '🌀 TAKARA TOMY BEYBLADE X BX-00 鈷藍龍 2-60C 黑色限定版', requester: '尤培霖代購', priceJpy: 2420, done: false },
     { id: 'shop-ypl-3', name: '🌀 TAKARA TOMY BEYBLADE X BX-34 鈷藍龍 2-60C', requester: '尤培霖代購', priceJpy: 1980, done: false },
