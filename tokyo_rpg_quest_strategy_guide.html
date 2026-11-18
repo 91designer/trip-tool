@@ -86,12 +86,15 @@
                 <i class="fa-brands fa-google-drive text-emerald-400"></i> 雲端資料夾
             </a>
 
-            <!-- BUDGET & SHARE BUTTONS -->
+            <!-- BUDGET, SHARE & GUIDE BUTTONS -->
             <button onclick="playSfx('click'); openBudgetModal()" class="pixel-btn text-xs py-1.5 px-2.5 text-amber-300 border-amber-500 font-bold flex items-center gap-1" title="開啟記帳與即時匯率換算">
                 <i class="fa-solid fa-coins text-amber-400"></i> 記帳預算
             </button>
             <button onclick="playSfx('click'); openShareModal()" class="pixel-btn text-xs py-1.5 px-2.5 text-sky-300 border-sky-500 font-bold flex items-center gap-1" title="一鍵分享專屬行程與導覽">
                 <i class="fa-solid fa-share-nodes text-sky-400"></i> 分享行程
+            </button>
+            <button onclick="playSfx('click'); openHelpModal()" class="pixel-btn pixel-btn-blue text-xs py-1.5 px-2.5 font-bold flex items-center gap-1" title="查看完整冒險指南與操作手冊">
+                <i class="fa-solid fa-book-open text-sky-300"></i> 操作說明
             </button>
 
             <button onclick="playSfx('click'); openAddPlaceModal()" class="pixel-btn pixel-btn-gold text-xs py-1.5 px-2.5 flex items-center gap-1">
@@ -116,10 +119,12 @@
                 <div class="border-b-2 border-slate-700 pb-2 mb-3">
                     <div class="flex items-center justify-between mb-2">
                         <h2 class="font-bold text-amber-400 text-sm font-pixel-jp flex items-center gap-2">
-                            <i class="fa-solid fa-book-bookmark"></i>
-                            🎒 冒險圖鑑與素材庫 (QUEST CODEX)
+                            <i class="fa-solid fa-cloud text-sky-400"></i>
+                            🌐 雲端素材庫與冒險圖鑑 (CLOUD CODEX)
                         </h2>
-                        <span id="placeTotalCount" class="text-xs px-2 py-0.5 bg-slate-800 text-amber-300 font-pixel-en border border-slate-600 rounded">0 ITEMS</span>
+                        <a id="codexSheetBtn" href="https://docs.google.com/spreadsheets/d/1FDs9cPR0WjZv_HitON78zJS_dKNHzN46jrRtpV13ldQ/edit" target="_blank" class="text-[10px] px-2 py-0.5 bg-emerald-950 text-emerald-300 font-pixel-jp border border-emerald-600/80 rounded hover:bg-emerald-900 flex items-center gap-1 font-bold" title="開啟雲端 Google 試算表直接編輯或新增景點">
+                            <i class="fa-solid fa-file-excel text-emerald-400"></i> 開啟雲端試算表
+                        </a>
                     </div>
 
                     <input type="text" id="placeSearchInput" placeholder="🔍 搜尋景點名稱、地名或關鍵字..." 
@@ -203,7 +208,7 @@
                         <i class="fa-solid fa-shield-halved text-sky-400"></i>
                         🗡️ 冒險支線任務與公會採購 (SIDE QUESTS & FEATS)
                     </h2>
-                    <span id="wishlistCompletion" class="text-xs font-pixel-en text-amber-300 font-bold">0/0 DONE</span>
+                    <span id="wishlistCompletion" class="text-xs font-pixel-jp text-amber-300 font-bold">0/0 DONE</span>
                 </div>
 
                 <!-- 遊戲化雙頁籤切換按鈕 (GAMIFIED SIDE QUEST TABS) -->
@@ -341,6 +346,27 @@
                 </button>
             </div>
 
+            <!-- ✨ 智慧網址解析與一鍵帶入 (SMART LINK PARSER) -->
+            <div class="bg-slate-900/90 p-2.5 rounded border-2 border-amber-500/60 space-y-1.5 font-pixel-jp">
+                <div class="flex items-center justify-between text-amber-300 text-xs font-bold">
+                    <span class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-400 animate-pulse"></i> ✨ 貼上 Google Maps / IG 貼文影片網址 (智慧解析)
+                    </span>
+                    <span class="text-[10px] text-slate-400">貼上網址自動填入名稱與座標</span>
+                </div>
+                <div class="flex gap-1.5">
+                    <input type="text" id="smartLinkInput" placeholder="貼上 Google Maps 或 IG 貼文/Reels 網址 (例: https://maps.app.goo.gl/...)" 
+                        oninput="parseSmartLink(this.value)"
+                        class="flex-1 bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-amber-300 rounded focus:outline-none focus:border-amber-400 font-pixel-jp">
+                    <button onclick="parseSmartLinkBtn()" class="pixel-btn pixel-btn-gold text-xs py-1 px-3 font-bold shrink-0 flex items-center gap-1">
+                        <i class="fa-solid fa-bolt"></i> 智慧帶入
+                    </button>
+                </div>
+                <div id="smartParseNotice" class="text-[10px] text-emerald-400 font-bold hidden flex items-center gap-1">
+                    <i class="fa-solid fa-circle-check"></i> <span id="smartParseNoticeText">已成功智慧解析網址資訊！</span>
+                </div>
+            </div>
+
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-slate-300 mb-1">景點類別：</label>
@@ -366,7 +392,7 @@
                 </div>
                 <div>
                     <label class="block text-slate-300 mb-1">直接裝備至行程 (選填)：</label>
-                    <select id="newDay" class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-amber-300 font-pixel-jp">
+                    <select id="newDayTarget" class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-amber-300 font-pixel-jp">
                         <option value="0">僅放入素材庫</option>
                         <option value="1">🗓️ 第 1 天</option>
                         <option value="2">🗓️ 第 2 天</option>
@@ -436,25 +462,7 @@
             </div>
 
             <div class="border-t border-slate-800 pt-2 space-y-2">
-                <label class="block text-slate-300">2. 新增景點雙向連動寫入網址 (選填 Web App URL)：</label>
-                <input type="text" id="scriptUrlInput" class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-slate-100 font-mono text-[11px]" placeholder="https://script.google.com/macros/s/.../exec">
-                <details class="text-[10px] text-slate-400 bg-slate-900/60 p-2 rounded border border-slate-800">
-                    <summary class="cursor-pointer text-amber-300 font-bold">💡 如何讓「發現新景點」自動寫入試算表？ (點擊查看30秒教學)</summary>
-                    <ol class="list-decimal list-inside space-y-1 mt-1 leading-relaxed">
-                        <li>開啟試算表，點擊上方選單 <b>擴充功能 ➔ Apps Script</b>。</li>
-                        <li>貼上以下 3 行程式碼並儲存：<br>
-                            <code class="block bg-slate-950 p-1 rounded text-emerald-400 mt-1 select-all font-mono text-[9px]">
-function doPost(e){ var s=SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); var d=JSON.parse(e.postData.contents); s.appendRow([d.code,d.category,d.name,d.sub,d.desc,d.day,d.mapQuery,d.lat,d.lng]); return ContentService.createTextOutput("OK"); }
-                            </code>
-                        </li>
-                        <li>點擊右上角 <b>部署 ➔ 新增部署 ➔ 種類選擇「Web 應用程式」</b>。</li>
-                        <li>誰有權存取選擇：<span class="text-amber-300">「所有人 (Anyone)」</span>，部署後複製網址貼至上方框中即可！</li>
-                    </ol>
-                </details>
-            </div>
-
-            <div class="border-t border-slate-800 pt-2 space-y-2">
-                <label class="block text-slate-300">3. Google Drive 旅程共用雲端資料夾網址 (擺放憑證/飯店/照片)：</label>
+                <label class="block text-slate-300">2. Google Drive 旅程共用雲端資料夾網址 (擺放憑證/飯店/照片)：</label>
                 <div class="flex gap-2">
                     <input type="text" id="driveFolderUrlInput" class="flex-1 bg-slate-900 border border-slate-700 p-2 rounded text-slate-100 font-mono text-[11px]" value="https://drive.google.com/drive/folders/1MZkiA956v0goxCa7Zu4HzP1EfZZ1yKeW?usp=drive_link" placeholder="https://drive.google.com/drive/folders/...">
                     <a id="modalDriveFolderLink" href="https://drive.google.com/drive/folders/1MZkiA956v0goxCa7Zu4HzP1EfZZ1yKeW?usp=drive_link" target="_blank" class="pixel-btn pixel-btn-green text-xs shrink-0 flex items-center gap-1">
@@ -695,6 +703,10 @@ function doPost(e){ var s=SpreadsheetApp.getActiveSpreadsheet().getActiveSheet()
             <span class="text-sm">💰</span>
             <span>記帳</span>
         </button>
+        <button onclick="playSfx('click'); openHelpModal()" class="flex flex-col items-center gap-0.5 text-sky-400 hover:text-sky-300 p-1 active:scale-95 transition font-bold shrink-0">
+            <span class="text-sm">📖</span>
+            <span>說明</span>
+        </button>
     </nav>
 
     <!-- MODAL: STARTUP ITINERARY SELECTION / LOAD CUSTOM SHEET -->
@@ -810,6 +822,212 @@ function doPost(e){ var s=SpreadsheetApp.getActiveSpreadsheet().getActiveSheet()
             <div class="flex items-center justify-end gap-2 border-t border-amber-900/60 pt-3">
                 <button onclick="closeFlightHotelModal()" class="pixel-btn text-xs py-1 px-3 text-slate-400 border-slate-600">取消</button>
                 <button onclick="saveFlightHotelModal()" class="pixel-btn pixel-btn-gold text-xs py-1 px-3 font-bold text-amber-200">儲存變更</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: HELP & STRATEGY MANUAL -->
+    <div id="helpModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] flex items-center justify-center hidden p-2 md:p-4 animate-fade-in">
+        <div class="pixel-box-gold max-w-3xl w-full p-4 md:p-5 rounded-lg text-xs space-y-3 shadow-2xl max-h-[90vh] flex flex-col">
+            <!-- HEADER -->
+            <div class="flex items-center justify-between border-b-2 border-amber-600/80 pb-2.5">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">📖</span>
+                    <div>
+                        <h3 class="font-bold text-amber-300 text-sm md:text-base font-pixel-jp">冒險指南與操作手冊 (STRATEGY MANUAL)</h3>
+                        <p class="text-[10px] text-amber-200/80 font-pixel-jp">新手冒險者必讀！東京 RPG 行程手冊全功能操作訣竅</p>
+                    </div>
+                </div>
+                <button onclick="closeHelpModal()" class="text-amber-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- TABS -->
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 border-b border-amber-900/60 font-pixel-jp">
+                <button id="helpTabBtn-quests" onclick="switchHelpTab('quests')" class="pixel-btn pixel-btn-gold text-[11px] py-1 px-2.5 font-bold text-amber-200 shrink-0">
+                    📜 主線行程與地圖
+                </button>
+                <button id="helpTabBtn-codex" onclick="switchHelpTab('codex')" class="pixel-btn text-[11px] py-1 px-2.5 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200 shrink-0">
+                    🎒 素材庫與智慧解析
+                </button>
+                <button id="helpTabBtn-sidequests" onclick="switchHelpTab('sidequests')" class="pixel-btn text-[11px] py-1 px-2.5 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200 shrink-0">
+                    🛍️ 支線任務與公會代購
+                </button>
+                <button id="helpTabBtn-budget" onclick="switchHelpTab('budget')" class="pixel-btn text-[11px] py-1 px-2.5 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200 shrink-0">
+                    🔮 速算盤與金幣記帳
+                </button>
+                <button id="helpTabBtn-cloud" onclick="switchHelpTab('cloud')" class="pixel-btn text-[11px] py-1 px-2.5 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200 shrink-0">
+                    🌐 雲端連線與備份
+                </button>
+            </div>
+
+            <!-- TAB CONTENTS (SCROLLABLE) -->
+            <div class="flex-1 overflow-y-auto space-y-3 pr-1 text-slate-200 font-pixel-jp leading-relaxed">
+                <!-- PANEL: QUESTS & MAP -->
+                <div id="helpPanel-quests" class="space-y-3">
+                    <div class="bg-slate-900/90 border border-sky-800/80 p-3 rounded space-y-2">
+                        <div class="font-bold text-sky-300 text-xs flex items-center gap-1.5 border-b border-sky-900/60 pb-1">
+                            <i class="fa-solid fa-scroll text-amber-400"></i> 1. 主線行程切換與自訂備忘
+                        </div>
+                        <ul class="list-disc list-inside space-y-1.5 text-[11px] text-slate-300">
+                            <li><b class="text-amber-300">切換天數：</b>點擊行程區上方的 <span class="bg-slate-800 px-1 py-0.5 rounded text-amber-300 font-mono">D1</span> ~ <span class="bg-slate-800 px-1 py-0.5 rounded text-amber-300 font-mono">D6</span> 頁籤，上方會立即換成當日的專屬主題與精華航線！</li>
+                            <li><b class="text-sky-300">即時筆記輸入框：</b>每筆行程卡片上的藍底文字框（例如：「10:00 抵達晴空塔...」）均可<b>直接點擊打字修改</b>，失焦或跳頁時系統會自動秒速存檔！</li>
+                            <li><b class="text-rose-300">卸除/刪除行程：</b>點擊卡片右側的 <span class="text-rose-400">✖</span> 可將景點從當日行程卸下（不會刪除素材庫原資料）。</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-amber-800/80 p-3 rounded space-y-2">
+                        <div class="font-bold text-amber-300 text-xs flex items-center gap-1.5 border-b border-amber-900/60 pb-1">
+                            <i class="fa-solid fa-map-location-dot text-emerald-400"></i> 2. 冒險地圖與導航連動
+                        </div>
+                        <ul class="list-disc list-inside space-y-1.5 text-[11px] text-slate-300">
+                            <li><b class="text-amber-300">地圖即時定位：</b>點擊行程卡片上的 <span class="pixel-btn text-[9px] py-0.5 px-1 text-sky-300">📍 地圖</span>，右上方 RPG 地圖會立刻飛躍平移至該座標並彈出地點介紹氣泡。</li>
+                            <li><b class="text-emerald-300">Google Maps 外部導航：</b>點擊卡片上的 <span class="pixel-btn pixel-btn-green text-[9px] py-0.5 px-1">導航</span>，會在新分頁直接開啟官方 Google 地圖 App，立刻規劃地鐵/步行路徑。</li>
+                            <li><b class="text-amber-300">僅顯示當日路線：</b>勾選地圖右上角「僅顯示當日行程路線」，地圖即自動隱藏其他天數的地標並連成當日軌跡。</li>
+                            <li><b class="text-sky-300">視角歸位：</b>迷失在地圖中時，點擊「歸位」按鈕可立即重置地圖視野回到東京中心。</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-amber-800/80 p-3 rounded space-y-2">
+                        <div class="font-bold text-amber-300 text-xs flex items-center gap-1.5 border-b border-amber-900/60 pb-1">
+                            <i class="fa-solid fa-plane-departure text-amber-400"></i> 3. 機票航班與飯店住宿資訊
+                        </div>
+                        <ul class="list-disc list-inside space-y-1.5 text-[11px] text-slate-300">
+                            <li>主線行程頂部的「樂桃航空來回機票」與「住宿據點」橫幅，可<b>直接點選輸入框修改內容</b>。</li>
+                            <li>或點擊右上角 <span class="pixel-btn text-[10px] py-0.5 px-1 text-amber-300">編輯</span> 按鈕開啟彈窗，詳細填寫航班號、時間、飯店導航連結等。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- PANEL: CODEX & SMART PARSER -->
+                <div id="helpPanel-codex" class="space-y-3 hidden">
+                    <div class="bg-slate-900/90 border border-amber-500/80 p-3 rounded space-y-2">
+                        <div class="font-bold text-amber-300 text-xs flex items-center gap-1.5 border-b border-amber-900/60 pb-1">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-400 animate-pulse"></i> ✨ 貼上 Google Maps / IG 網址「智慧一鍵解析」
+                        </div>
+                        <p class="text-[11px] text-slate-300">
+                            看到 IG 推薦美食或是 Google Maps 上的神秘新景點，不用再一個個手動查經緯度！
+                        </p>
+                        <ol class="list-decimal list-inside space-y-2 text-[11px] text-slate-300 pl-1">
+                            <li>點擊頂部選單的 <span class="pixel-btn pixel-btn-gold text-[10px] py-0.5 px-1.5 font-bold">➕ 發現新景點</span>。</li>
+                            <li>在視窗最上方的 <b class="text-amber-300">「✨ 貼上 Google Maps / IG 貼文影片網址」</b> 輸入框中貼上複製的網址：
+                                <div class="bg-slate-950 p-2 rounded border border-slate-700 font-mono text-[10px] text-emerald-400 my-1 space-y-0.5">
+                                    <div>📍 Google Maps：https://maps.app.goo.gl/... 或包含座標的網址</div>
+                                    <div>🎬 Instagram：https://www.instagram.com/reel/... 或貼文連結</div>
+                                </div>
+                            </li>
+                            <li>系統會<b>秒速自動提取</b>：景點名稱、類別（美食/神社/朝聖/購物）、GPS 經緯度座標與地圖關鍵字！</li>
+                            <li>可選擇「直接裝備至行程 (D1~D6)」或「僅放入素材庫」，點擊<b>「新增登錄」</b>即大功告成！</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-slate-700 p-3 rounded space-y-2">
+                        <div class="font-bold text-slate-200 text-xs flex items-center gap-1.5 border-b border-slate-800 pb-1">
+                            <i class="fa-solid fa-book-bookmark text-sky-400"></i> 雲端素材庫檢索與裝備
+                        </div>
+                        <ul class="list-disc list-inside space-y-1.5 text-[11px] text-slate-300">
+                            <li><b class="text-amber-300">類別過濾：</b>點擊全部、⛩️ 神社、🍵 抹茶、🥩 美食、📷 朝聖、🎡 樂園、🛍️ 購物按鈕即時篩選。</li>
+                            <li><b class="text-sky-300">關鍵字搜尋：</b>支援店名、地名（如「台場」、「新宿」、「和牛」）即時模糊搜尋。</li>
+                            <li><b class="text-emerald-300">一鍵裝備：</b>在卡片中選擇天數並點擊「➕ 裝備至行程」，景點立刻加入當日探險路線！</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- PANEL: SIDE QUESTS & PROXY SHOPPING -->
+                <div id="helpPanel-sidequests" class="space-y-3 hidden">
+                    <div class="bg-slate-900/90 border border-sky-800/80 p-3 rounded space-y-2">
+                        <div class="font-bold text-sky-300 text-xs flex items-center gap-1.5 border-b border-sky-900/60 pb-1">
+                            <i class="fa-solid fa-ticket text-sky-400"></i> 1. 支線任務與預約備忘 (TICKETS & FEATS)
+                        </div>
+                        <ul class="list-disc list-inside space-y-1.5 text-[11px] text-slate-300">
+                            <li>記錄所有需要預先購票、預約時段或特定任務（如：哈利波特影城、吉卜力美術館、挽肉與米整理券）。</li>
+                            <li>任務完成後勾選左側方框，文字會畫上刪除線，進度一目了然！</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-amber-800/80 p-3 rounded space-y-2">
+                        <div class="font-bold text-amber-300 text-xs flex items-center gap-1.5 border-b border-amber-900/60 pb-1">
+                            <i class="fa-solid fa-cart-shopping text-amber-400"></i> 2. 冒險者公會委託 (代購與採購清單)
+                        </div>
+                        <ul class="list-disc list-inside space-y-1.5 text-[11px] text-slate-300">
+                            <li><b class="text-amber-300">雙頁籤切換：</b>點擊「🛍️ 冒險者公會委託」切換至代購專用儀表板。</li>
+                            <li><b class="text-sky-300">新增委託項目：</b>輸入商品名稱（如：DHC 魚油、戰鬥陀螺）、委託人（如：Roger代購、喵喵代購）與日幣估價即可新增。</li>
+                            <li><b class="text-emerald-300">即時估價加總：</b>右上角即時統計「已購數/總數」與「日幣總估價 + 自動換算台幣」。</li>
+                            <li><b class="text-amber-300">💰 一鍵轉記帳：</b>買到商品後，點擊卡片上的「💰 轉記帳」，系統會自動將該筆消費帶入金幣庫記帳本中！</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- PANEL: BUDGET & ALCHEMIST CALCULATOR -->
+                <div id="helpPanel-budget" class="space-y-3 hidden">
+                    <div class="bg-slate-900/90 border border-amber-500/80 p-3 rounded space-y-2">
+                        <div class="font-bold text-amber-300 text-xs flex items-center gap-1.5 border-b border-amber-900/60 pb-1">
+                            <i class="fa-solid fa-calculator text-amber-400"></i> 1. 🔮 鍊金術士速算盤 (RPG NUMPAD CALCULATOR)
+                        </div>
+                        <ul class="list-disc list-inside space-y-1.5 text-[11px] text-slate-300">
+                            <li><b class="text-amber-300">實體按鈕速算：</b>主畫面下方設有專屬 4x5 算盤，包含 0~9 數字鍵與加減乘除，買藥妝、餐廳分帳時單手就能按！</li>
+                            <li><b class="text-sky-300">支援算式連續計算：</b>可以直接算式連打（例如：<code class="bg-slate-950 px-1 py-0.5 rounded text-amber-300 font-mono">1580 + 2420 * 2</code>），點擊 <span class="bg-amber-600 px-1 rounded text-slate-950 font-bold">=</span> 立即結算！</li>
+                            <li><b class="text-emerald-300">零時差日幣換算台幣：</b>算盤下方即時顯示對應台幣金額（自動計入當前匯率與 1.5% 海外刷卡手續費）。</li>
+                            <li><b class="text-amber-300">一鍵入帳：</b>按完算盤點擊「💰 轉入記帳」，就能直接將金額存入記帳清單！</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-amber-800/80 p-3 rounded space-y-2">
+                        <div class="font-bold text-amber-300 text-xs flex items-center gap-1.5 border-b border-amber-900/60 pb-1">
+                            <i class="fa-solid fa-coins text-amber-400"></i> 2. 金幣庫記帳與匯率面板
+                        </div>
+                        <ul class="list-disc list-inside space-y-1.5 text-[11px] text-slate-300">
+                            <li>點擊頂部選單的 <span class="pixel-btn text-[10px] py-0.5 px-1.5 text-amber-300 font-bold">💰 記帳預算</span> 開啟完整面板。</li>
+                            <li><b class="text-sky-300">即時擷取匯率：</b>點擊「即時擷取」可線上抓取最新 JPY ➔ TWD 匯率，亦可手動自由微調。</li>
+                            <li><b class="text-emerald-300">現金與刷卡統計：</b>清楚劃分現金消費與信用卡消費總額，避免日幣現金超支。</li>
+                            <li><b class="text-amber-300">匯出與分享：</b>點擊「匯出 CSV」可下載 Excel 表格，點擊「複製清單」可一鍵複製文字發到 LINE 群組核對！</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- PANEL: CLOUD SYNC & BACKUP -->
+                <div id="helpPanel-cloud" class="space-y-3 hidden">
+                    <div class="bg-slate-900/90 border border-emerald-800/80 p-3 rounded space-y-2">
+                        <div class="font-bold text-emerald-300 text-xs flex items-center gap-1.5 border-b border-emerald-900/60 pb-1">
+                            <i class="fa-solid fa-cloud text-emerald-400"></i> 1. Google 試算表純共用同步 (無需設定 Apps Script)
+                        </div>
+                        <ul class="list-disc list-inside space-y-1.5 text-[11px] text-slate-300">
+                            <li>本系統採用<b>純 Google Sheet 共用模式</b>，只需將試算表共用權限設為「知道連結的任何人皆可檢視」，系統即可全自動同步！</li>
+                            <li>每次開啟網頁或點擊頂部 <span class="pixel-btn text-[10px] py-0.5 px-1.5 text-emerald-300">試算表同步</span>，皆會自動從線上雲端抓取最新資料。</li>
+                            <li>點擊素材庫標題旁的「開啟雲端試算表」可以直接在新分頁開啟共享表格線上編輯。</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-amber-800/80 p-3 rounded space-y-2">
+                        <div class="font-bold text-amber-300 text-xs flex items-center gap-1.5 border-b border-amber-900/60 pb-1">
+                            <i class="fa-brands fa-google-drive text-emerald-400"></i> 2. 旅程共用 Google Drive 雲端資料夾
+                        </div>
+                        <p class="text-[11px] text-slate-300">
+                            點擊頂部選單的 <span class="pixel-btn text-[10px] py-0.5 px-1.5 text-emerald-300 font-bold">雲端資料夾</span> 按鈕，即可快速直達大家的 Google Drive 共用空間，集中存放電子機票 PDF、飯店預訂確認單、門票 QR Code 與旅程照片！
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-slate-700 p-3 rounded space-y-2">
+                        <div class="font-bold text-slate-200 text-xs flex items-center gap-1.5 border-b border-slate-800 pb-1">
+                            <i class="fa-solid fa-floppy-disk text-amber-400"></i> 3. 本機存檔、匯出與自訂行程
+                        </div>
+                        <ul class="list-disc list-inside space-y-1.5 text-[11px] text-slate-300">
+                            <li><b class="text-amber-300">自動即時存檔：</b>任何修改、打勾、換日、備註輸入都會立即儲存於您的瀏覽器中。</li>
+                            <li><b class="text-sky-300">存檔備份：</b>點擊「存檔」可下載完整的 JSON 設定檔。</li>
+                            <li><b class="text-amber-300">切換行程模式：</b>點擊「切換行程」可重新載入官方預設 6 日路線，或自訂旅遊天數、出發日期並綁定自訂的 Google 試算表！</li>
+                            <li><b class="text-emerald-300">8-bit 音樂與音效：</b>點擊頂部 BGM 播放復古冒險主題樂，音樂採用獨立排程器，按鈕音效觸發時背景音樂流暢不卡頓！</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="flex items-center justify-between border-t border-amber-900/60 pt-2.5 font-pixel-jp">
+                <span class="text-[10px] text-slate-400">💡 祝全體冒險者旅途平安、刷寶愉快！</span>
+                <button onclick="closeHelpModal()" class="pixel-btn pixel-btn-gold text-xs py-1 px-4 font-bold text-amber-200">
+                    關閉指南
+                </button>
             </div>
         </div>
     </div>

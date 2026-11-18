@@ -2,7 +2,7 @@
 // 💾 DATA STORAGE & RESTORE HELPERS
 // -------------------------------------------------------------
 
-const CURRENT_DATA_VERSION = '2026-09-08-v38-add-miau-kiddy-land-opanchu-usagi';
+const CURRENT_DATA_VERSION = '2026-09-08-v39-add-in-app-strategy-guide-manual';
 
 function saveData() {
     try {

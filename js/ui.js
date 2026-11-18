@@ -1017,3 +1017,44 @@ function saveFlightHotelModal() {
     closeFlightHotelModal();
     if (typeof showCustomAlert === 'function') showCustomAlert('機票與住宿資訊已成功儲存！', '✈️');
 }
+
+// -------------------------------------------------------------
+// 📖 HELP & STRATEGY MANUAL MODAL CONTROLS
+// -------------------------------------------------------------
+
+function openHelpModal(tab = 'quests') {
+    const modal = document.getElementById('helpModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        switchHelpTab(tab);
+        if (typeof playSfx === 'function') playSfx('click');
+    }
+}
+
+function closeHelpModal() {
+    const modal = document.getElementById('helpModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function switchHelpTab(tabName) {
+    const tabs = ['quests', 'codex', 'sidequests', 'budget', 'cloud'];
+    tabs.forEach(t => {
+        const btn = document.getElementById('helpTabBtn-' + t);
+        const panel = document.getElementById('helpPanel-' + t);
+        if (btn) {
+            if (t === tabName) {
+                btn.className = 'pixel-btn pixel-btn-gold text-[11px] py-1 px-2.5 font-bold text-amber-200 shrink-0';
+            } else {
+                btn.className = 'pixel-btn text-[11px] py-1 px-2.5 text-slate-400 bg-slate-900 border border-slate-700 hover:text-slate-200 shrink-0';
+            }
+        }
+        if (panel) {
+            if (t === tabName) {
+                panel.classList.remove('hidden');
+            } else {
+                panel.classList.add('hidden');
+            }
+        }
+    });
+}
+
